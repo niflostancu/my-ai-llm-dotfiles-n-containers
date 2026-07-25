@@ -1,0 +1,46 @@
+services:
+  llama-server:
+    # image: personal/llama.cpp-amd-gfx1100
+    build:
+      context: .
+      args:
+        LLAMA_GIT_URL: "https://github.com/TheTom/llama-cpp-turboquant.git"
+        LLAMA_GIT_BRANCH: "feature/turboquant-kv-cache"
+    container_name: ai-llama-cpp
+    restart: unless-stopped
+    privileged: true
+    ipc: host
+    shm_size: "8gb"
+    security_opt:
+      - seccomp=unconfined
+    devices:
+      - /dev/kfd
+      - /dev/dri
+      - /dev/mem
+    cap_add:
+      - CAP_SYS_ADMIN
+      - SYS_PTRACE
+    # group_add:
+    #   - render
+    ports:
+      - "127.0.0.1:${LLAMA_HOST_PORT:-11444}:11444"
+    volumes:
+      # Host-mounted models
+      - ${LLAMA_HOST_MODELS_DIR}:/models:ro
+    networks:
+      - ai-agents
+    environment:
+      HIP_VISIBLE_DEVICES: "0,1"
+      GGML_VK_VISIBLE_DEVICES: "0"
+    env_file: .env
+    command: [
+      "llama-server", "--host", "0.0.0.0", "--port", "11444",
+      "--models-preset", "/models/llama-cpp.ini"
+    ]
+networks:
+  ai-agents:
+    name: ai-agents-net
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.host_binding_ipv4: "127.0.0.1"
+
