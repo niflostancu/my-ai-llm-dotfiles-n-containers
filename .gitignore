@@ -1,0 +1,15 @@
+# Local environment
+.env
+*.local.*
+
+# Build artifacts
+build/
+dist/
+
+# Archives, logs
+*.tar.gz
+*.log
+
+# OS stuff
+.DS_Store
+Thumbs.db
