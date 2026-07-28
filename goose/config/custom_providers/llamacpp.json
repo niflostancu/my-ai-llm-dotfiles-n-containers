@@ -4,6 +4,7 @@
   "display_name": "Local llama.cpp Server",
   "description": "Local llama.cpp OpenAI-compatible API on host",
   "api_key_env": "LLAMACPP_API_KEY",
-  "base_url": "http://host.docker.internal:11444/v1"
+  "base_url": "http://host.docker.internal:11444/v1",
+  "models": [],
+  "supports_streaming": true
 }
-

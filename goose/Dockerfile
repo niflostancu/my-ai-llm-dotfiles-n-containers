@@ -5,7 +5,7 @@ FROM ghcr.io/aaif-goose/goose:latest
 USER root
 RUN export DEBIAN_FRONTEND="noninteractive"; \
 	apt-get update && apt-get install -y \
-		iputils-ping netcat-openbsd neovim \
+		iproute2 iputils-ping netcat-openbsd neovim \
 	&& rm -rf /var/lib/apt/lists/*
 
 # change back to our non-privileged user

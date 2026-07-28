@@ -30,6 +30,7 @@ push: PUSH=1
 push: build
 
 install:
+	rsync -avh "./config/" "$(HOME)/.config/goose/"
 	install -m0755 "goose-agent.sh" "$(HOME)/.local/bin"
 
 .PHONY: build build_force push run

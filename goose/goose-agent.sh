@@ -3,12 +3,13 @@
 set -eo pipefail
 
 GOOSE_IMAGE="personal/ai-goose"
-ENV_FILE="$HOME/.config/.secure/goose.env"
+ENV_FILE="$HOME/.config/goose/.env"
 
 # parse args & extract command name
 NAME=""
 ARGS=()
 DOCKER_ARGS=()
+DOCKER_NET=ai-agents-net
 while [ $# -gt 0 ]; do
 	if [[ -z "$NAME" && "$1" != "-"* ]]; then NAME="$1"; fi
 	if [[ "$1" == "--shell" ]]; then 
@@ -26,7 +27,8 @@ DOCKER_ARGS+=(
 	--init
 	# prevent accidental DoS
 	--memory="4g" --cpus="4"
-	--network "ai-agents-net"
+	--network "$DOCKER_NET"
+	--add-host=host.docker.internal:host-gateway
 	-v "$WORKDIR:$WORKDIR" --workdir "$WORKDIR"
 	-u "$(id -u):$(id -g)"
 )
@@ -45,6 +47,10 @@ for vol in "${VOLUMES[@]}"; do
 	if [[ "$owner" != "$exp_uids" ]]; then sudo chown "$exp_uids" "$HOME/$vol"; fi
 	DOCKER_ARGS+=(-v "$HOME/$vol:/home/goose/$vol")
 done
+
+docker network create -d bridge \
+	-o "com.docker.network.bridge.name"="d-ai-net" \
+	"$DOCKER_NET" &>/dev/null || true
 
 exec docker run "${DOCKER_ARGS[@]}" "$GOOSE_IMAGE" "${ARGS[@]}"
 
