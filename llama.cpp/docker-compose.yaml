@@ -27,6 +27,7 @@ services:
     volumes:
       # Host-mounted models
       - ${LLAMA_HOST_MODELS_DIR}:/models:ro
+      - ./config/:/etc/llamacpp/:ro
     networks:
       - ai-agents
     environment:
@@ -35,7 +36,7 @@ services:
     env_file: .env
     command: [
       "llama-server", "--host", "0.0.0.0", "--port", "11444",
-      "--models-preset", "/models/llama-cpp.ini"
+      "--models-preset", "/models/models.ini"
     ]
 networks:
   ai-agents:
