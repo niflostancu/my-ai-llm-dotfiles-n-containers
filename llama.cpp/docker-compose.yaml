@@ -23,7 +23,7 @@ services:
     # group_add:
     #   - render
     ports:
-      - "127.0.0.1:${LLAMA_HOST_PORT:-11444}:11444"
+      - "${LLAMA_HOST_BIND:-127.0.0.1}:${LLAMA_HOST_PORT:-11444}:11444"
     volumes:
       # Host-mounted models
       - ${LLAMA_HOST_MODELS_DIR}:/models:ro
