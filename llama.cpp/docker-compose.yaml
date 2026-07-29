@@ -1,12 +1,13 @@
+name: ai-llama
 services:
-  llama-server:
+  server:
+    container_name: ai-llama-server
     # image: personal/llama.cpp-amd-gfx1100
     build:
       context: .
       args:
         LLAMA_GIT_URL: "https://github.com/TheTom/llama-cpp-turboquant.git"
         LLAMA_GIT_BRANCH: "feature/turboquant-kv-cache"
-    container_name: ai-llama-cpp
     restart: unless-stopped
     privileged: true
     ipc: host
@@ -36,8 +37,9 @@ services:
     env_file: .env
     command: [
       "llama-server", "--host", "0.0.0.0", "--port", "11444",
-      "--models-preset", "/models/models.ini"
+      "--models-preset", "/etc/llamacpp/models.ini"
     ]
+
 networks:
   ai-agents:
     name: ai-agents-net
