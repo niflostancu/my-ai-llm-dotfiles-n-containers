@@ -1,0 +1,20 @@
+smart_approve:
+  always_allow:
+  - todo__todo_write
+  - read_image
+  ask_before:
+  - edit
+  - shell
+  - write
+  never_allow:
+  - platform__manage_schedule
+  - extensionmanager__manage_extensions
+user:
+  always_allow:
+  - analyze
+  - load_skill
+  ask_before:
+  - write
+  - edit
+  - shell
+  never_allow: []
