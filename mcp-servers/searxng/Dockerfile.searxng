@@ -1,0 +1,6 @@
+FROM docker.io/searxng/searxng:latest
+
+COPY ./scripts/ /usr/share/searxng-extra/
+
+ENTRYPOINT ["/usr/share/searxng-extra/new-entrypoint.sh"]
+

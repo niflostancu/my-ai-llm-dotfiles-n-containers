@@ -1,0 +1,56 @@
+name: ai-searxng
+
+services:
+  core:
+    container_name: ai-searxng-core
+    build:
+      context: .
+      dockerfile: ./Dockerfile.searxng
+    restart: always
+    ports:
+      - ${SEARXNG_HOST_BIND:+${SEARXNG_HOST_BIND}:}${SEARXNG_HOST_PORT:-11480}:8080
+    env_file: .env
+    volumes:
+      - ./config/:/etc/searxng-user/:ro
+      - core-data:/var/cache/searxng/
+    networks:
+      - searxng-backend
+
+  mcp-search:
+    container_name: ai-searxng-mcp
+    image: isokoliuk/mcp-searxng:latest
+    stdin_open: true
+    environment:
+      - SEARXNG_URL=${SEARXNG_URL:-http://ai-searxng-core:8080}
+      - MCP_HTTP_PORT=8080
+      - MCP_HTTP_HOST=0.0.0.0
+      - SEARXNG_LITE_TOOLS=true
+      - SEARXNG_MAX_RESULTS=10
+      - SEARXNG_MAX_RESULT_CHARS=500
+    networks:
+      - searxng-backend
+      - ai-agents
+
+  valkey:
+    container_name: ai-searxng-valkey
+    image: docker.io/valkey/valkey:9-alpine
+    command: valkey-server --save 30 1 --loglevel warning
+    restart: always
+    volumes:
+      - valkey-data:/data/
+    networks:
+      - searxng-backend
+
+volumes:
+  core-data:
+  valkey-data:
+
+networks:
+  searxng-backend:
+  ai-agents:
+    name: ai-agents-net
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.host_binding_ipv4: "127.0.0.1"
+      com.docker.network.bridge.name: "d-ai-net"
+
