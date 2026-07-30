@@ -2,7 +2,7 @@
 # Goose Agent (containerized using Docker)
 set -eo pipefail
 
-GOOSE_IMAGE="personal/ai-goose"
+GOOSE_IMAGE=${GOOSE_IMAGE:-"personal/ai-ag-goose"}
 ENV_FILE="$HOME/.config/goose/.env"
 
 # parse args & extract command name
@@ -30,7 +30,7 @@ DOCKER_ARGS+=(
 	--network "$DOCKER_NET"
 	--add-host=host.docker.internal:host-gateway
 	-v "$WORKDIR:$WORKDIR" --workdir "$WORKDIR"
-	-u "$(id -u):$(id -g)"
+	-e "AGENT_UID=$(id -u)" -e "AGENT_GID=$(id -g)"
 )
 if [[ -f "$ENV_FILE" ]]; then DOCKER_ARGS+=(--env-file "$ENV_FILE"); fi
 if [ -t 0 ]; then DOCKER_ARGS+=(-t); fi

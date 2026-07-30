@@ -1,0 +1,32 @@
+# Base container for AI agents / tools (usually both)
+FROM debian:13
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y \
+    	# Common networking utils
+    	iputils-ping iproute2 netcat-openbsd ca-certificates curl wget gnupg \
+        # development tools
+    	bash git build-essential python3 python3-pip libssl3 \
+        # Linux CLI tools
+    	gosu ripgrep fd-find jq zip unzip tree \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create an unprivileged user to use by agent processes
+RUN groupadd -g 1234 ai-agents && \
+    useradd -m -u 1234 -g ai-agents agent
+
+# Node.js
+RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - && \
+    apt-get update && apt-get install -y nodejs && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install uv using curl
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+
+COPY --chmod=755 scripts/entrypoint.sh /usr/local/bin/entrypoint-base.sh
+ENTRYPOINT ["/usr/local/bin/entrypoint-base.sh"]
+WORKDIR /workspace
+# note: entrypoint will run the command as `agent`
+CMD ["/bin/bash"]
+

@@ -1,37 +1,21 @@
-# Docker Image Makefile
+# Customized Goose Agent makefile
 
-VERSION := latest
-PUSH?=
-ALL?=$(PUSH)
-LOAD?=$(if $(ALL),,1)
-
-IMAGE_NAME = ai-goose
-IMAGE_TAGS = $(VERSION)
 IMAGE_PREFIX = personal/
-FULL_IMAGE_NAME=$(IMAGE_PREFIX)$(IMAGE_NAME)
+docker_goose-image-name = ai-ag-goose
+docker_goose-dockerfile = Dockerfile
+docker_goose-buildx-args = \
+	--build-arg "BASE_IMAGE=$(IMAGE_PREFIX)ai-ag-base" \
+	--build-arg "GOOSE_BRANCH=v1.45.0"
 
-PLATFORMS=linux/amd64,linux/arm64
-BUILDX_ARGS?=
-BUILDX_ARGS+=$(if $(ALL),--platform $(PLATFORMS))
-BUILDX_ARGS += $(if $(V),--progress=plain)
+-include config.local.mk
+include ../base/_docker_lib.mk
 
--include local.mk
+.PHONY: all install
+all: docker_goose_build
 
-_full_tag_args = $(foreach tag,latest $(IMAGE_TAGS),-t "$(FULL_IMAGE_NAME):$(tag)")
-
-build:
-	docker buildx build $(BUILDX_ARGS) $(_full_tag_args) -f Dockerfile \
-		$(if $(PUSH),--push,$(if $(LOAD),--load)) .
-
-build_force: BUILDX_ARGS+= --pull --no-cache
-build_force: build
-
-push: PUSH=1
-push: build
+$(call add_docker_target,docker_goose)
 
 install:
 	rsync -avh "./config/" "$(HOME)/.config/goose/"
 	install -m0755 "goose-agent.sh" "$(HOME)/.local/bin"
-
-.PHONY: build build_force push run
 
