@@ -30,3 +30,8 @@ RUN export DEBIAN_FRONTEND="noninteractive"; \
 
 COPY --from=builder /usr/src/goose/target/release/goose /usr/local/bin/
 
+RUN --mount=from=mcp-addons,target=/tmp/mcp-addons \
+	cd /tmp/mcp-addons/code-index-mcp; ./install.sh
+
+RUN rm -rf /tmp/*
+

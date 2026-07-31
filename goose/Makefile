@@ -5,7 +5,8 @@ docker_goose-image-name = ai-ag-goose
 docker_goose-dockerfile = Dockerfile
 docker_goose-buildx-args = \
 	--build-arg "BASE_IMAGE=$(IMAGE_PREFIX)ai-ag-base" \
-	--build-arg "GOOSE_BRANCH=v1.45.0"
+	--build-arg "GOOSE_BRANCH=v1.45.0" \
+	--build-context mcp-addons=../mcp-servers/
 
 -include config.local.mk
 include ../base/_docker_lib.mk

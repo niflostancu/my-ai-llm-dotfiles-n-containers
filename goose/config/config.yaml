@@ -108,7 +108,7 @@ extensions:
     enabled: true
     type: streamable_http
     name: searxng-mcp
-    description: SearXNG Open Web Search MCP extension
+    description: searxng open web search mcp extension
     uri: http://ai-searxng-mcp:8080/mcp
     envs: {}
     env_keys: []
@@ -116,4 +116,12 @@ extensions:
     timeout: 300
     socket: null
     bundled: null
+
+  code-index-mcp:
+    enabled: true
+    type: stdio
+    name: code-index-mcp
+    cmd: uvx
+    args: ["code-index-mcp"]
+    timeout: 300
 
