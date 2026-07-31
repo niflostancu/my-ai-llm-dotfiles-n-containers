@@ -21,8 +21,8 @@ RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - && \
     apt-get update && apt-get install -y nodejs && \
     rm -rf /var/lib/apt/lists/*
 
-# Install uv using curl
-RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+# Install uv bins from official layer
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
 
 COPY --chmod=755 scripts/ /usr/local/bin/
 ENTRYPOINT ["/usr/local/bin/entrypoint-base.sh"]
