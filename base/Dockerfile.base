@@ -24,7 +24,7 @@ RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - && \
 # Install uv using curl
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 
-COPY --chmod=755 scripts/entrypoint.sh /usr/local/bin/entrypoint-base.sh
+COPY --chmod=755 scripts/ /usr/local/bin/
 ENTRYPOINT ["/usr/local/bin/entrypoint-base.sh"]
 WORKDIR /workspace
 # note: entrypoint will run the command as `agent`

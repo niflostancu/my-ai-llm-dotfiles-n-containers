@@ -16,5 +16,3 @@ if [ -n "$AGENT_UID" ]; then
 	chown -R "${AGENT_UID}:${AGENT_GID}" /home/agent
 fi
 
-exec gosu agent "$@"
-
