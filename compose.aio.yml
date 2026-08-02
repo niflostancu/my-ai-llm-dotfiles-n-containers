@@ -1,0 +1,14 @@
+# All-in-one Docker Compose descriptor
+# Consolidates llama.cpp server + SearXNG MCP stack
+
+name: ai-aio
+
+include:
+  - llama.cpp/llamacpp.compose.yml
+  - mcp-servers/mcp-all.compose.yml
+
+services:
+  llamacpp:
+    container_name: ai-llama-server
+    profiles: !reset []
+

@@ -1,8 +1,12 @@
-name: ai-llama
+# Common Docker Compose definitions for llama.cpp
+
 services:
-  server:
+  llamacpp:
     container_name: ai-llama-server
-    image: personal/llama.cpp-rocm-gfx1100
+    # image built using Makefile
+    image: ${LLAMACPP_IMAGE:-personal/llama.cpp-rocm-gfx1100}
+    # only run when this profile was enabled
+    profiles: [ 'llamacpp' ]
     restart: unless-stopped
     privileged: true
     ipc: host

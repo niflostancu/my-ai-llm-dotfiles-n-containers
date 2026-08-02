@@ -1,0 +1,10 @@
+name: ai-llama-server
+
+include:
+  - llamacpp.compose.yml
+
+services:
+  llamacpp:
+    container_name: ai-llama-server
+    profiles: !reset []
+
