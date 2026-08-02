@@ -2,12 +2,7 @@ name: ai-llama
 services:
   server:
     container_name: ai-llama-server
-    # image: personal/llama.cpp-amd-gfx1100
-    build:
-      context: .
-      args:
-        LLAMA_GIT_URL: "https://github.com/TheTom/llama-cpp-turboquant.git"
-        LLAMA_GIT_BRANCH: "feature/turboquant-kv-cache"
+    image: personal/llama.cpp-rocm-gfx1100
     restart: unless-stopped
     privileged: true
     ipc: host
