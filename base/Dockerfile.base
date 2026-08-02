@@ -1,28 +1,47 @@
 # Base container for AI agents / tools (usually both)
 FROM debian:13
 
-ENV DEBIAN_FRONTEND=noninteractive
-
-RUN apt-get update && apt-get install -y \
+# non-interactive environment + UTF-8 locale
+RUN DEBIAN_FRONTEND=noninteractive; apt-get update && apt-get install -y \
     	# Common networking utils
     	iputils-ping iproute2 netcat-openbsd ca-certificates curl wget gnupg \
         # development tools
-    	bash git build-essential python3 python3-pip libssl3 \
+    	bash git build-essential make cmake python3 python3-pip libssl3 \
         # Linux CLI tools
-    	gosu ripgrep fd-find jq zip unzip tree \
-    && rm -rf /var/lib/apt/lists/*
+    	gosu ripgrep fd-find bat jq zip unzip xz-utils tree file locales htop \
+    	less vim-nox neovim openssh-client man-db \
+    && rm -rf /var/lib/apt/lists/* \
+    && localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
+
+ENV LANG=en_US.UTF-8 \
+    LANGUAGE=en_US:en \
+    LC_ALL=en_US.UTF-8
+
+# Debian ships bat as `batcat` and fd as `fdfind` to avoid naming conflicts...
+RUN ln -sf /usr/bin/batcat /usr/local/bin/bat \
+    && ln -sf /usr/bin/fdfind /usr/local/bin/fd
 
 # Create an unprivileged user to use by agent processes
 RUN groupadd -g 1234 ai-agents && \
     useradd -m -u 1234 -g ai-agents agent
+ENV HOME=/home/agent
 
-# Node.js
+# Node.js + Bun
 RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - && \
     apt-get update && apt-get install -y nodejs && \
+    npm install -g bun && \
     rm -rf /var/lib/apt/lists/*
 
 # Install uv bins from official layer
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
+
+# Install golang (fetch latest stable)
+RUN set -eux; \
+    GO_VERSION="$(curl -fsSL 'https://go.dev/VERSION?m=text' | head -1)"; \
+    echo "Installing ${GO_VERSION} for linux/amd64"; \
+    curl -fsSL "https://go.dev/dl/${GO_VERSION}.linux-amd64.tar.gz" \
+        | tar -xz -C /usr/local; \
+    /usr/local/go/bin/go version
 
 COPY --chmod=755 scripts/ /usr/local/bin/
 ENTRYPOINT ["/usr/local/bin/entrypoint-base.sh"]

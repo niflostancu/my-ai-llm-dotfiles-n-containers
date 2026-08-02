@@ -13,14 +13,18 @@ BUILDX_PLATFORMS ?= linux/amd64,linux/arm64
 
 # build control vars
 FORCE ?=
+PULL ?=
 PUSH ?=
 ALL ?= $(PUSH)
 LOAD ?= $(if $(ALL),,1)
+DEBUG ?=
 
 EXTRA_BUILDX_ARGS ?=
 EXTRA_BUILDX_ARGS += $(if $(ALL),--platform $(BUILDX_PLATFORMS))
 EXTRA_BUILDX_ARGS += $(if $(V),--progress=plain)
-EXTRA_BUILDX_ARGS += $(if $(FORCE),--pull --no-cache)
+EXTRA_BUILDX_ARGS += $(if $(FORCE),--no-cache)
+EXTRA_BUILDX_ARGS += $(if $(PULL),--pull)
+EXTRA_BUILDX_ARGS += $(if $(DEBUG),--progress=plain)
 
 # macro helpers
 _def_value = $(if $($(1)),$($(1)),$(2))
