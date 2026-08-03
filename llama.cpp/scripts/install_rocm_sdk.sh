@@ -17,9 +17,9 @@ THEROCK_TARBALL_PFX="therock-dist-linux-${ROCM_GFX}-"
 # resolve latest tarball key from S3 bucket listing
 # Note: this returns XML, uses ugly bash hack to "parse" it
 KEY="$(curl -s "${THEROCK_BASE}?list-type=2&prefix=${THEROCK_TARBALL_PFX}" \
-  | tr '<' '\n' \
-  | grep -o "${THEROCK_TARBALL_PFX}${ROCM_VERSION_PATTERN}.*\.tar\.gz" \
-  | sort -V | tail -n1 || true)"
+    | tr '<' '\n' \
+    | grep -o "${THEROCK_TARBALL_PFX}${ROCM_VERSION_PATTERN}.*\.tar\.gz" \
+    | sort -V | tail -n1 || true)"
 
 if [ -z "$KEY" ]; then
   echo "ERROR: no tarball matching ${THEROCK_TARBALL_PFX} found at ${THEROCK_BASE}" >&2
@@ -33,11 +33,18 @@ mkdir -p /opt/rocm
 tar xzf therock.tar.gz -C /opt/rocm --strip-components=1
 rm therock.tar.gz
 
-BITCODE_PATH=$(find /opt/rocm -type d -name bitcode -print -quit)
+echo "Optimizing ROCm package (removing unneeded files)..."
+(
+    cd /opt/rocm
+    # remove test/benchmark applications
+    rm -rf ./clients ./tests
+    rm -rf ./bin/*-test ./bin/*-bench ./bin/*test* ./bin/*example*
+)
 
 # Drop a profile.d fragment so interactive shells in the container pick up
 # the ROCm env automatically. The Dockerfile ALSO sets the same variables
 # via ENV so non-interactive RUN layers see them during build.
+BITCODE_PATH=$(find /opt/rocm -type d -name bitcode -print -quit)
 cat > /etc/profile.d/rocm-sdk.sh <<EOF
 export ROCM_PATH=/opt/rocm
 export HIP_PLATFORM=amd

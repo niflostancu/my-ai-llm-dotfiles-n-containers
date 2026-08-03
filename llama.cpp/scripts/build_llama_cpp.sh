@@ -7,13 +7,9 @@ export HIP_DEVICE_LIB_PATH
 
 LLAMA_GPU_TARGETS=${LLAMA_GPU_TARGETS:-"gfx1100"}
 
-# apt-get update && \
-# 	apt-get install -y libomp-dev libopenblas-dev \
-# 	python3 python3-pip python3-venv
-
 LLAMA_CMAKE_ARGS=(
 	-DCMAKE_BUILD_TYPE=Release
-    -DCMAKE_INSTALL_PREFIX=/usr/local
+    -DCMAKE_INSTALL_PREFIX=/opt/llama.cpp/
     -DCMAKE_HIP_COMPILER=/opt/rocm/llvm/bin/clang++ \
 	-DCMAKE_HIP_FLAGS="-mllvm --amdgpu-unroll-threshold-local=600"
     -DCMAKE_C_COMPILER=/opt/rocm/llvm/bin/clang \
@@ -51,12 +47,9 @@ LLAMA_CMAKE_ARGS=(
 )
 
 cmake -S . -B build -G Ninja "${LLAMA_CMAKE_ARGS[@]}"
-cmake --build build -- -j "$(ncpu --ignore=2)" || {
-	cat /opt/llama.cpp/build/_deps/zendnn-prefix/src/zendnn-stamp/zendnn-build-*.log;
-	exit 1;
-}
-# proper install to /usr/local so ldconfig finds libllama-common, libmtmd, etc.
+cmake --build build -- -j "$(ncpu --ignore=2)"
+
+# install to prefix & remove build files
 cmake --install build
-ldconfig
-rm -rf /opt/llama.cpp/build
+rm -rf /opt/llama-build
 

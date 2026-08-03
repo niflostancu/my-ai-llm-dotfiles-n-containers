@@ -1,5 +1,5 @@
 # Build custom llama.cpp / forks from source TheRock ROCm for gfx110X (7900XT[X])
-FROM ubuntu:26.04
+FROM ubuntu:26.04 AS builder
 
 ARG ROCM_VERSION_PREFIX=7
 ARG ROCM_GFX=gfx110X
@@ -28,13 +28,30 @@ ENV ROCM_PATH=/opt/rocm HIP_PATH=/opt/rocm HIP_PLATFORM=amd \
     LD_LIBRARY_PATH=/opt/rocm/lib:/opt/rocm/lib64:/opt/rocm/llvm/lib
 
 # Clone llama.cpp (or custom fork)
-RUN git clone -b "${LLAMA_GIT_BRANCH}" "${LLAMA_GIT_URL}" /opt/llama.cpp
-WORKDIR /opt/llama.cpp
+RUN git clone -b "${LLAMA_GIT_BRANCH}" "${LLAMA_GIT_URL}" /opt/llama-build
+WORKDIR /opt/llama-build
 COPY --chmod=755 scripts/build_llama_cpp.sh /tmp/build_llama_cpp.sh
 RUN /tmp/build_llama_cpp.sh
 
-ENV PATH=/usr/local/bin:$PATH \
-    LD_LIBRARY_PATH=/usr/local/lib:/opt/rocm/lib:/opt/rocm/llvm/lib
+FROM ubuntu:26.04
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      ca-certificates curl tar xz-utils procps \
+      libatomic1 libnuma1 libgomp1 libstdc++6 \
+    && rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
+
+COPY --from=builder /opt/llama.cpp/ /opt/llama.cpp/
+
+COPY --from=builder /opt/rocm/lib/libamdhip64.so* \
+    /opt/rocm/lib/libhsa-*.so* /opt/rocm/lib/libhipblas*.so* \
+    /opt/rocm/lib/libroc*.so* /opt/rocm/lib/libamd_comgr*.so* \
+    /opt/rocm/lib/
+COPY --from=builder /opt/rocm/llvm/lib/*.so* /opt/rocm/llvm/lib/
+COPY --from=builder /opt/rocm/lib/rocm_sysdeps/ /opt/rocm/lib/rocm_sysdeps
+COPY --from=builder /opt/rocm/lib/rocblas/library /opt/rocm/lib/rocblas/library
+
+ENV PATH=/opt/llama.cpp/bin:$PATH \
+    LD_LIBRARY_PATH=/opt/llama.cpp/lib:/opt/rocm/lib:/opt/rocm/llvm/lib
 
 WORKDIR /models
 CMD ["/bin/bash"]
