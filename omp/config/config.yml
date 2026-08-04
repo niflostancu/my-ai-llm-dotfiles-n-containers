@@ -1,0 +1,34 @@
+setupVersion: 1
+
+modelRoles: 
+  default: llamacpp/Ornith-1.0-35B-UD-Q6_K_XL
+
+searxng: 
+  endpoint: http://ai-searxng-core:8080
+  token: ""
+
+providers: 
+  webSearchTimeoutSeconds: 30
+  maxInFlightRequests: 
+    llamacpp: 3
+  webSearchOrder: 
+    - searxng
+  webSearchExclude: [
+    "perplexity", "gemini", "anthropic", "codex", "exa", "xai", "zai",
+    "tinyfish", "jina", "kagi", "tavily", "firecrawl", "brave", "kimi",
+    "parallel", "synthetic", "startpage", "duckduckgo", "ecosia", "google", 
+    "mojeek", "public",
+  ]
+
+exa: 
+  enabled: false
+bash: 
+  enabled: false
+
+eval: 
+  py: true
+  js: true
+
+edit: 
+  mode: hashline
+

@@ -1,0 +1,7 @@
+providers:
+  llamacpp:
+    baseUrl: http://host.docker.internal:11444/v1
+    apiKey: "unused"
+    api: openai-completions
+    discovery: { "type": "llama.cpp"}
+
