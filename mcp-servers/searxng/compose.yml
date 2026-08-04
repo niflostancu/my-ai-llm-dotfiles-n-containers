@@ -15,6 +15,7 @@ services:
       - core-data:/var/cache/searxng/
     networks:
       - searxng-backend
+      - ai-agents
 
   mcp-search:
     container_name: ai-searxng-mcp
