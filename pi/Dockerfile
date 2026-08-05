@@ -27,3 +27,10 @@ FROM pi AS omp
 
 RUN curl -fsSL https://omp.sh/install | \
 	PI_INSTALL_DIR=/usr/local/bin sh -s -- --binary
+
+FROM pi AS little
+
+ENV LITTLE_CODER_MODELS_FILE="$PI_CODING_AGENT_DIR/models.json" \
+	LITTLE_CODER_EXTENSIONS_DIR="$PI_CODING_AGENT_DIR/extensions"
+
+RUN bun install -g little-coder

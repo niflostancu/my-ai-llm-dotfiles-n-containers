@@ -27,6 +27,7 @@ CMD=pi
 PI_AGENT_HOME="$HOME/.config/pi-agent${_PI_SUFFIX}"
 PI_AGENT_IMAGE=${PI_AGENT_IMAGE:-"personal/ai-ag-pi${_PI_SUFFIX}"}
 DOCKER_ENV="$PI_AGENT_HOME/.env"
+if [[ "$PI_CFG" == "little" ]]; then CMD=little-coder; fi
 if [[ "$PI_CFG" == "omp" ]]; then CMD=omp; fi
 
 # extract relative path to use as project workdir inside container

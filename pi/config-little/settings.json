@@ -1,0 +1,6 @@
+{
+  "packages": [
+    "npm:pi-llama-cpp"
+  ],
+  "llamaServerUrl": "http://host.docker.internal:11444"
+}
