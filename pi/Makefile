@@ -1,5 +1,6 @@
 # Customized Pi Coding Agent makefile
 
+# set to either pi/little/omp (recommended: inside config.local.mk)
 PI_CFG ?= pi
 
 IMAGE_PREFIX = personal/
@@ -15,6 +16,10 @@ docker_omp-image-name = ai-ag-pi-omp
 docker_omp-dockerfile = Dockerfile
 docker_omp-buildx-args = $(docker_pi_args) --target "omp"
 
+docker_little-image-name = ai-ag-pi-little
+docker_little-dockerfile = Dockerfile
+docker_little-buildx-args = $(docker_pi_args) --target "little"
+
 -include ../config.local.mk
 include ../base/_docker_lib.mk
 
@@ -24,6 +29,7 @@ build: docker_$(PI_CFG)_build
 
 $(call add_docker_target,docker_pi)
 $(call add_docker_target,docker_omp)
+$(call add_docker_target,docker_little)
 
 install:
 	PI_SUFFIX=""; [ "$(PI_CFG)" = "pi" ] || PI_SUFFIX="-$(PI_CFG)"; \

@@ -12,7 +12,7 @@ docker_llamacpp-buildx-args = \
 	--build-arg "LLAMA_GIT_URL=$(LLAMA_GIT_URL)" \
 	--build-arg "LLAMA_GIT_BRANCH=$(LLAMA_GIT_BRANCH)"
 
--include config.local.mk
+-include ../config.local.mk
 include ../base/_docker_lib.mk
 
 .PHONY: all install
