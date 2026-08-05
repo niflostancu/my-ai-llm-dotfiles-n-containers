@@ -23,3 +23,7 @@ RUN --mount=from=mcp-addons,target=/tmp/mcp-addons \
 
 RUN rm -rf /tmp/*
 
+FROM pi AS omp
+
+RUN curl -fsSL https://omp.sh/install | \
+	PI_INSTALL_DIR=/usr/local/bin sh -s -- --binary

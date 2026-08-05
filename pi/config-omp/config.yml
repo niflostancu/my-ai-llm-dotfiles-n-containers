@@ -13,12 +13,10 @@ providers:
     llamacpp: 3
   webSearchOrder: 
     - searxng
-  webSearchExclude: [
-    "perplexity", "gemini", "anthropic", "codex", "exa", "xai", "zai",
-    "tinyfish", "jina", "kagi", "tavily", "firecrawl", "brave", "kimi",
-    "parallel", "synthetic", "startpage", "duckduckgo", "ecosia", "google", 
-    "mojeek", "public",
-  ]
+  webSearchExclude: [ "perplexity", "gemini", "anthropic", "codex", "exa",
+    "xai", "zai", "tinyfish", "jina", "kagi", "tavily", "firecrawl", "brave",
+    "kimi", "parallel", "synthetic", "startpage", "duckduckgo", "ecosia",
+    "google", "mojeek", "public" ]
 
 exa: 
   enabled: false
