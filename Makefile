@@ -13,8 +13,8 @@ docker_llamacpp:
 docker_goose:
 	$(MAKE) -C goose
 
-docker_omp:
-	$(MAKE) -C omp
+docker_pi:
+	$(MAKE) -C pi
 
 install_all:
 	$(MAKE) -C goose install

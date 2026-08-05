@@ -1,0 +1,6 @@
+{
+  "searxngUrl": "http://ai-searxng-core:8080",
+  "timeoutMs": 30000,
+  "maxResults": 10,
+  "safesearch": "off"
+}

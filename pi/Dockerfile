@@ -1,0 +1,25 @@
+# Dockerfile for containerized Pi agent (various variants)
+
+ARG BASE_IMAGE="personal/ai-agent-base"
+
+FROM ${BASE_IMAGE} AS pi
+
+# install extra packages?
+#RUN export DEBIAN_FRONTEND="noninteractive"; \
+# 	apt-get update && apt-get install -y \
+# 		 neovim \
+# 	&& rm -rf /var/lib/apt/lists/*
+
+ENV PATH="/home/agent/.bun/bin:$PATH" \
+	PI_CODING_AGENT_DIR="${HOME}/.config/pi-agent" \
+ 	PI_CODING_AGENT_SESSION_DIR="${HOME}/.local/share/pi-agent/sessions"
+
+# install pi-coding-agent
+RUN bun install -g --ignore-scripts @earendil-works/pi-coding-agent
+
+# install custom shared tools
+RUN --mount=from=mcp-addons,target=/tmp/mcp-addons \
+	cd /tmp/mcp-addons/code-index-mcp; ./install.sh
+
+RUN rm -rf /tmp/*
+
