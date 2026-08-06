@@ -1,8 +1,8 @@
 # Top-level makefile for personal AI/LLM tooling
 
-.PHONY: docker_all docker_base docker_goose docker_omp
+.PHONY: docker_all docker_base docker_goose docker_pi
 
-docker_all: docker_base docker_goose docker_omp
+docker_all: docker_base docker_goose docker_pi
 
 docker_base:
 	$(MAKE) -C base
