@@ -3,9 +3,9 @@
     "npm:pi-llama-cpp",
     "npm:pi-agent-extensions",
     "npm:pi-mcp-adapter",
+    "npm:pi-thinking-box",
     "npm:@ff-labs/pi-fff",
     "npm:@mjasnikovs/pi-task",
-    "npm:@amartinr/pi-searxng",
     "git:github.com/DietrichGebert/ponytail"
   ],
   "llamaServerUrl": "http://host.docker.internal:11444"

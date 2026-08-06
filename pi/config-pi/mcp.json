@@ -4,6 +4,11 @@
       "command": "uvx",
       "args": ["code-index-mcp"],
       "directTools": true
+    },
+    "ketch": {
+      "command": "ketch",
+      "args": ["mcp", "serve"],
+      "directTools": ["search", "scrape"]
     }
   }
 }

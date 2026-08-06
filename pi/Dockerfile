@@ -20,7 +20,8 @@ RUN gosu agent bun install -g --ignore-scripts @earendil-works/pi-coding-agent &
 
 # install custom shared tools
 RUN --mount=from=mcp-addons,target=/tmp/mcp-addons \
-	cd /tmp/mcp-addons/code-index-mcp && ./install.sh
+	cd /tmp/mcp-addons/code-index-mcp && ./install.sh && \
+	cd /tmp/mcp-addons/ketch && ./install.sh
 
 ENV PATH="/home/agent/go/bin:$PATH"
 
