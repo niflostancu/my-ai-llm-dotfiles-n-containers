@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "code-index-mcp": {
+      "command": "uvx",
+      "args": ["code-index-mcp"],
+      "directTools": true
+    }
+  }
+}
