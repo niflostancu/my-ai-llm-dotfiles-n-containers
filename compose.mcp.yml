@@ -1,0 +1,7 @@
+# MCP servers Docker Compose descriptor
+
+name: ai-mcp
+
+include:
+  - mcp-servers/mcp-all.compose.yml
+
