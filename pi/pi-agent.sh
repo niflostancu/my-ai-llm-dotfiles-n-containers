@@ -8,14 +8,16 @@ if [[ -f "$PI_AGENT_DEF_ENV" ]]; then source "$PI_AGENT_DEF_ENV"; fi
 # parse args & extract command name
 NAME=""
 ARGS=()
-ENTER_SHELL=
+CUSTOM_COMMAND=
 DOCKER_ARGS=()
 PI_CFG=${PI_CFG:-"pi"}
 DOCKER_NET=ai-agents-net
 while [ $# -gt 0 ]; do
 	if [[ -z "$NAME" && "$1" != "-"* ]]; then NAME="$1"; fi
-	if [[ "$1" == "--shell" ]]; then 
-		ENTER_SHELL=1; DOCKER_ARGS+=(--entrypoint bash);
+	if [[ "$1" == "--cmd" ]]; then 
+		CUSTOM_COMMAND=1;
+	elif [[ "$1" == "--shell" ]]; then 
+		CUSTOM_COMMAND=1; DOCKER_ARGS+=(--entrypoint bash);
 	else ARGS+=("$1"); fi; shift
 done
 NAME="${NAME:-default}"
@@ -47,7 +49,7 @@ DOCKER_ARGS+=(
 if [[ -f "$DOCKER_ENV" ]]; then DOCKER_ARGS+=(--env-file "$DOCKER_ENV"); fi
 if [ -t 0 ]; then DOCKER_ARGS+=(-t); fi
 
-[[ -n "$ENTER_SHELL" ]] || ARGS=($CMD "${ARGS[@]}")
+[[ -n "$CUSTOM_COMMAND" ]] || ARGS=($CMD "${ARGS[@]}")
 
 VOLUMES=(
 	".config/pi-agent"

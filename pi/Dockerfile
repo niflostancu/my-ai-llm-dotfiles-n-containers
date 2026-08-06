@@ -15,7 +15,8 @@ ENV PATH="/home/agent/.bun/bin:$PATH" \
  	PI_CODING_AGENT_SESSION_DIR="${HOME}/.local/share/pi-agent/sessions"
 
 # install pi-coding-agent
-RUN bun install -g --ignore-scripts @earendil-works/pi-coding-agent
+RUN bun install -g --ignore-scripts @earendil-works/pi-coding-agent && \
+	bun install -g pi-acp
 
 # install custom shared tools
 RUN --mount=from=mcp-addons,target=/tmp/mcp-addons \
