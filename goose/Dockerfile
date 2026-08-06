@@ -22,11 +22,11 @@ RUN git clone --depth=1 --branch="${GOOSE_BRANCH}" \
 # runtime stage (using our base image)
 FROM ${BASE_IMAGE}
 
-# install extra packages
-RUN export DEBIAN_FRONTEND="noninteractive"; \
-	apt-get update && apt-get install -y \
-		 neovim \
-	&& rm -rf /var/lib/apt/lists/*
+# install extra packages?
+# RUN export DEBIAN_FRONTEND="noninteractive"; \
+# 	apt-get update && apt-get install -y \
+# 		 neovim \
+# 	&& rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /usr/src/goose/target/release/goose /usr/local/bin/
 
