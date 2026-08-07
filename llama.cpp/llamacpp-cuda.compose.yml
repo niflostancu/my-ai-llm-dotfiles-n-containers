@@ -1,0 +1,33 @@
+# Docker Compose definitions for llama.cpp (CUDA variant)
+
+services:
+  llamacpp:
+    container_name: ai-llama-server
+    image: ${LLAMACPP_IMAGE:-personal/llama.cpp-cuda}
+    profiles: [ 'llamacpp' ]
+    restart: unless-stopped
+    devices:
+      - nvidia.com/gpu=all
+    ports:
+      - "${LLAMA_HOST_BIND:-127.0.0.1}:${LLAMA_HOST_PORT:-11444}:11444"
+    volumes:
+      # Host-mounted models
+      - ${LLAMA_HOST_MODELS_DIR}:/models:ro
+      - ./config/:/etc/llamacpp/:ro
+    networks:
+      - ai-agents
+    environment:
+      CUDA_VISIBLE_DEVICES: "0"
+    env_file: .env
+    command: [
+      "llama-server", "--host", "0.0.0.0", "--port", "11444",
+      "--models-preset", "/etc/llamacpp/models_cuda.ini"
+    ]
+
+networks:
+  ai-agents:
+    name: ai-agents-net
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.host_binding_ipv4: "127.0.0.1"
+      com.docker.network.bridge.name: "d-ai-net"

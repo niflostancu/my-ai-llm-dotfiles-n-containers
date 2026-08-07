@@ -1,11 +1,13 @@
-# Build custom llama.cpp / forks from source TheRock ROCm for gfx110X (7900XT[X])
-FROM ubuntu:26.04 AS builder
+# Build custom llama.cpp / forks from source for TheRock ROCm
+
+ARG UBUNTU_VERSION=26.04
+FROM ubuntu:${UBUNTU_VERSION} AS builder
 
 ARG ROCM_VERSION_PREFIX=7
 ARG ROCM_GFX=gfx110X
 
-ARG LLAMA_GIT_URL=https://github.com/ggml-org/llama.cpp.git
-ARG LLAMA_GIT_BRANCH=15fa3c493
+ARG LLAMACPP_GIT_URL=https://github.com/ggml-org/llama.cpp.git
+ARG LLAMACPP_GIT_BRANCH=master
 
 # Install dependencies
 ENV DEBIAN_FRONTEND=noninteractive
@@ -28,12 +30,12 @@ ENV ROCM_PATH=/opt/rocm HIP_PATH=/opt/rocm HIP_PLATFORM=amd \
     LD_LIBRARY_PATH=/opt/rocm/lib:/opt/rocm/lib64:/opt/rocm/llvm/lib
 
 # Clone llama.cpp (or custom fork)
-RUN git clone -b "${LLAMA_GIT_BRANCH}" "${LLAMA_GIT_URL}" /opt/llama-build
+RUN git clone -b "${LLAMACPP_GIT_BRANCH}" "${LLAMACPP_GIT_URL}" /opt/llama-build
 WORKDIR /opt/llama-build
-COPY --chmod=755 scripts/build_llama_cpp.sh /tmp/build_llama_cpp.sh
-RUN /tmp/build_llama_cpp.sh
+COPY --chmod=755 scripts/build_llama_rocm.sh /tmp/build_llama_rocm.sh
+RUN /tmp/build_llama_rocm.sh
 
-FROM ubuntu:26.04
+FROM ubuntu:${UBUNTU_VERSION}
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
       ca-certificates curl tar xz-utils procps \

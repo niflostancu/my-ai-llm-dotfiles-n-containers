@@ -1,0 +1,46 @@
+# Build custom llama.cpp from source with CUDA support
+
+ARG UBUNTU_VERSION=26.04
+ARG CUDA_VERSION=13.3.1
+
+ARG BASE_CUDA_DEV=docker.io/nvidia/cuda:${CUDA_VERSION}-devel-ubuntu${UBUNTU_VERSION}
+ARG BASE_CUDA_RUN=docker.io/nvidia/cuda:${CUDA_VERSION}-runtime-ubuntu${UBUNTU_VERSION}
+
+# Build stage: nvcc + headers
+FROM ${BASE_CUDA_DEV} AS builder
+
+ARG LLAMACPP_GIT_URL=https://github.com/ggml-org/llama.cpp.git
+ARG LLAMACPP_GIT_BRANCH=master
+ARG LLAMA_CUDA_ARCHITECTURES=75;80;86;89;90;100;120
+
+# Install build dependencies
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y --no-install-recommends \
+	build-essential cmake ninja-build git \
+	libssl-dev zlib1g-dev libnuma-dev \
+	libgoogle-perftools4 libtcmalloc-minimal4 \
+	ca-certificates curl aria2 wget tar xz-utils procps \
+    && rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
+
+# Clone llama.cpp (or custom fork)
+RUN git clone -b "${LLAMACPP_GIT_BRANCH}" "${LLAMACPP_GIT_URL}" /opt/llama-build
+WORKDIR /opt/llama-build
+
+COPY scripts/build_llama_cuda.sh /tmp/build_llama_cuda.sh
+RUN env LLAMA_CUDA_ARCHITECTURES="${LLAMA_CUDA_ARCHITECTURES}" /tmp/build_llama_cuda.sh
+
+# Server stage: just runtime libs
+FROM ${BASE_CUDA_RUN}
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      ca-certificates curl tar xz-utils procps \
+      libnuma1 libgomp1 libstdc++6 libgoogle-perftools4 \
+    && rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
+
+COPY --from=builder /opt/llama.cpp/ /opt/llama.cpp/
+
+ENV PATH=/opt/llama.cpp/bin:$PATH \
+    LD_LIBRARY_PATH=/opt/llama.cpp/lib:/usr/local/nvidia/lib64
+
+WORKDIR /models
+CMD ["/bin/bash"]
