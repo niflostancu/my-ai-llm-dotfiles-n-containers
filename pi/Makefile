@@ -3,6 +3,8 @@
 # set to either pi/little/omp (recommended: inside config.local.mk)
 PI_CFG ?= pi
 
+XDG_DATA_HOME ?= $(HOME)/.local/share
+
 IMAGE_PREFIX = personal/
 docker_pi_args = \
 	--build-arg "BASE_IMAGE=$(IMAGE_PREFIX)ai-ag-base" \
@@ -35,5 +37,7 @@ install:
 	PI_SUFFIX=""; [ "$(PI_CFG)" = "pi" ] || PI_SUFFIX="-$(PI_CFG)"; \
 		rsync -avh "./config-$(PI_CFG)/" "$(HOME)/.config/pi-agent$$PI_SUFFIX/"
 	echo "PI_CFG=$(PI_CFG)" > "$(HOME)/.config/pi-agent-default.env"
+	install -m0755 -d "$(XDG_DATA_HOME)/ai-agent/lib"
+	install -m0755 "../base/docker-helpers.sh" "$(XDG_DATA_HOME)/ai-agent/lib/"
 	install -m0755 "pi-agent.sh" "$(HOME)/.local/bin"
 
