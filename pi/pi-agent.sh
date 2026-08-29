@@ -10,59 +10,54 @@ else
 	source "${XDG_DATA_HOME:-$HOME/.local/share}/ai-agent/lib/docker-helpers.sh"
 fi
 
-# defaults
+# also load the env containing the default PI_CFG
 PI_CFG=${PI_CFG:-"pi"}
-NAME=${NAME:-}
-CMDNAME=${CMDNAME:-DEFAULT}
-CUSTOM_COMMAND=
+PI_AGENT_DEF_ENV="$HOME/.config/pi-agent-default.env"
+[[ ! -f "$PI_AGENT_DEF_ENV" ]] || source "$PI_AGENT_DEF_ENV"
+_PI_SUFFIX=; [[ "$PI_CFG" == "pi" ]] || _PI_SUFFIX="-${PI_CFG}"
 
+# defaults
 # extract relative path to use as project workdir inside container
 WORKDIR=$PWD
 NAME=$(get_project_name "$WORKDIR")
-
+DOCKER_PI_IMAGE=${DOCKER_PI_IMAGE:-"personal/ai-ag-pi${_PI_SUFFIX}"}
 DOCKER_USERNAME=agent
 DOCKER_NET=ai-agents-net
-HOST_VOLUMES=(
-	"$HOME/.config/pi-agent$_PI_SUFFIX"
-	"$HOME/.local/share/pi-agent$_PI_SUFFIX"
-)
-DOCKER_ARGS=()
-
-# load user-specific environment
-PI_AGENT_DEF_ENV="$HOME/.config/pi-agent-default.env"
-if [[ -f "$PI_AGENT_DEF_ENV" ]]; then source "$PI_AGENT_DEF_ENV"; fi
-
-# parse cmd args
-ARGS=()
-while [ $# -gt 0 ]; do
-	if [[ -z "$CMDNAME" && "$1" != "-"* ]]; then CMDNAME="$1"; fi
-	if [[ "$1" == "--name" ]]; then 
-		NAME="$2"; shift;
-	elif [[ "$1" == "--cmd" ]]; then 
-		CUSTOM_COMMAND=1;
-	elif [[ "$1" == "--shell" ]]; then 
-		CUSTOM_COMMAND=1; DOCKER_ARGS+=(--entrypoint bash);
-		CMDNAME="SHELL"
-	elif [[ "$1" == "--" ]]; then
-		shift; ARGS=("$@");
-		if [[ -z "$CMDNAME" ]]; then CMDNAME="${ARGS[1]}"; fi
-		break
-	else ARGS+=("$1"); fi; shift
-done
-NAME="${NAME:-unknown}"
 
 # use separate home config paths for the different cfg variants
-_PI_SUFFIX=
-[[ "$PI_CFG" == "pi" ]] || _PI_SUFFIX="-${PI_CFG}"
-_PI_CMD=(pi)
-PI_AGENT_HOME="$HOME/.config/pi-agent${_PI_SUFFIX}"
-PI_AGENT_IMAGE=${PI_AGENT_IMAGE:-"personal/ai-ag-pi${_PI_SUFFIX}"}
-DOCKER_ENV="$PI_AGENT_HOME/.env"
-if [[ "$PI_CFG" == "little" ]]; then _PI_CMD=(little-coder); fi
-if [[ "$PI_CFG" == "omp" ]]; then _PI_CMD=(omp); fi
+PI_AGENT_DIR=${PI_AGENT_DIR:-"pi-agent${_PI_SUFFIX}"}
+PI_AGENT_HOME=${PI_AGENT_HOME:-"$HOME/.config/${PI_AGENT_DIR}"}
+PI_AGENT_SHARE=${PI_AGENT_SHARE:-"$HOME/.local/share/${PI_AGENT_DIR}"}
+HOST_VOLUMES=(
+	"$PI_AGENT_HOME"
+	"$HOME/.local/share/pi-agent$_PI_SUFFIX"
+)
+DOCKER_ENV=${DOCKER_ENV:-"$PI_AGENT_HOME/.env"}
+[ -z ${DOCKER_ARGS+x} ] || DOCKER_ARGS=()
 
+CMD_ARGS=(pi)
+if [[ "$PI_CFG" == "little" ]]; then CMD_ARGS=(little-coder); fi
+if [[ "$PI_CFG" == "omp" ]]; then CMD_ARGS=(omp); fi
+# parse cmd args
+while [ $# -gt 0 ]; do
+	if [[ "$1" == "--name" ]]; then
+		NAME="$2"; shift;
+	elif [[ "$1" == "--cmd" ]]; then
+		CMD_ARGS=();
+	elif [[ "$1" == "--root-shell" ]]; then
+		CMD_ARGS=(--root-shell)
+	else 
+		if [[ "$1" == "--" ]]; then shift; fi
+		CMD_ARGS+=("$@"); break
+	fi
+	shift
+done
+
+# finally, build the docker environment
+NAME="${NAME:-unknown}"
+_CMDNAME="${CMD_ARGS+"${CMD_ARGS[0]}"}"
 DOCKER_ARGS+=(
-	-i --name "pi${_PI_SUFFIX}-$NAME-$CMDNAME" --rm
+	-i --name "pi${_PI_SUFFIX}-$NAME-$_CMDNAME" --rm
 	# run tini as PID 1 (since pi will spawn lots of children)
 	--init
 	# prevent accidental DoS
@@ -72,13 +67,10 @@ DOCKER_ARGS+=(
 	--workdir "$WORKDIR"
 	-e "AGENT_UID=$(id -u)" -e "AGENT_GID=$(id -g)"
 )
-docker_add_volume "$WORKDIR" "$WORKDIR"
-
-if [[ -f "$DOCKER_ENV" ]]; then DOCKER_ARGS+=(--env-file "$DOCKER_ENV"); fi
 if [ -t 0 ]; then DOCKER_ARGS+=(-t); fi
+if [[ -f "$DOCKER_ENV" ]]; then DOCKER_ARGS+=(--env-file "$DOCKER_ENV"); fi
 
-[[ -n "$CUSTOM_COMMAND" ]] || ARGS=("${_PI_CMD[@]}" "${ARGS[@]}")
-
+docker_add_volume "$WORKDIR" "$WORKDIR"
 for host_vol in "${HOST_VOLUMES[@]}"; do
 	# leave 2nd argument empty for auto container path
 	docker_add_volume "$host_vol"
@@ -88,4 +80,4 @@ docker network create -d bridge \
 	-o "com.docker.network.bridge.name"="d-ai-net" \
 	"$DOCKER_NET" &>/dev/null || true
 
-exec docker run "${DOCKER_ARGS[@]}" "$PI_AGENT_IMAGE" "${ARGS[@]}"
+exec docker run "${DOCKER_ARGS[@]}" "$DOCKER_PI_IMAGE" "${CMD_ARGS[@]}"
