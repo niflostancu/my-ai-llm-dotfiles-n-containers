@@ -1,5 +1,7 @@
 # Customized Goose Agent makefile
 
+XDG_DATA_HOME ?= $(HOME)/.local/share
+
 IMAGE_PREFIX = personal/
 docker_goose-image-name = ai-ag-goose
 docker_goose-dockerfile = Dockerfile
@@ -16,7 +18,11 @@ all: docker_goose_build
 
 $(call add_docker_target,docker_goose)
 
+GOOSE_AGENT_HOME ?= goose
+
 install:
-	rsync -avh "./config/" "$(HOME)/.config/goose/"
+	rsync -avh "./config/" "$(HOME)/.config/$(GOOSE_AGENT_HOME)/"
+	install -m0755 -d "$(XDG_DATA_HOME)/ai-agent/lib"
+	install -m0755 "../base/docker-helpers.sh" "$(XDG_DATA_HOME)/ai-agent/lib/"
 	install -m0755 "goose-agent.sh" "$(HOME)/.local/bin"
 

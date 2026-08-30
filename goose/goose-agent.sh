@@ -2,28 +2,54 @@
 # Goose Agent (containerized using Docker)
 set -eo pipefail
 
-GOOSE_IMAGE=${GOOSE_IMAGE:-"personal/ai-ag-goose"}
-ENV_FILE="$HOME/.config/goose/.env"
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 
-# parse args & extract command name
-NAME=""
-ARGS=()
-ENTER_SHELL=
-DOCKER_ARGS=()
-DOCKER_NET=ai-agents-net
-while [ $# -gt 0 ]; do
-	if [[ -z "$NAME" && "$1" != "-"* ]]; then NAME="$1"; fi
-	if [[ "$1" == "--shell" ]]; then 
-		ENTER_SHELL=1; DOCKER_ARGS+=(--entrypoint bash);
-	else ARGS+=("$1"); fi; shift
-done
-NAME="${NAME:-default}"
+if [[ -f "$SCRIPT_DIR/../base/docker-helpers.sh" ]]; then
+	source "$SCRIPT_DIR/../base/docker-helpers.sh"
+else
+	source "${XDG_DATA_HOME:-$HOME/.local/share}/ai-agent/lib/docker-helpers.sh"
+fi
 
+# defaults
 # extract relative path to use as project workdir inside container
 WORKDIR=$PWD
+NAME=$(get_project_name "$WORKDIR")
+DOCKER_GOOSE_IMAGE=${DOCKER_GOOSE_IMAGE:-"personal/ai-ag-goose"}
+DOCKER_USERNAME=agent
+DOCKER_NET=ai-agents-net
 
+# use separate home config paths for the different cfg variants
+GOOSE_AGENT_DIR=${GOOSE_AGENT_DIR:-"goose"}
+GOOSE_AGENT_HOME=${GOOSE_AGENT_HOME:-"$HOME/.config/${GOOSE_AGENT_DIR}"}
+HOST_VOLUMES=(
+	"$GOOSE_AGENT_HOME"
+	"$HOME/.local/share/$GOOSE_AGENT_DIR"
+	"$HOME/.local/state/$GOOSE_AGENT_DIR"
+)
+DOCKER_ENV=${DOCKER_ENV:-"$GOOSE_AGENT_HOME/.env"}
+[ -z ${DOCKER_ARGS+x} ] || DOCKER_ARGS=()
+
+# parse args & extract command name
+CMD_ARGS=(goose)
+while [ $# -gt 0 ]; do
+	if [[ "$1" == "--name" ]]; then
+		NAME="$2"; shift;
+	elif [[ "$1" == "--cmd" ]]; then
+		CMD_ARGS=();
+	elif [[ "$1" == "--root-shell" ]]; then
+		CMD_ARGS=(--root-shell)
+	else 
+		if [[ "$1" == "--" ]]; then shift; fi
+		CMD_ARGS+=("$@"); break
+	fi
+	shift
+done
+
+# finally, build the docker environment
+NAME="${NAME:-unknown}"
+_CMDNAME="${CMD_ARGS+"${CMD_ARGS[0]}"}"
 DOCKER_ARGS+=(
-	-i --name "goose-$NAME" --rm
+	-i --name "goose-$NAME-$_CMDNAME" --rm
 	# run tini as PID 1 (since goose will spawn lots of children)
 	--init
 	# prevent accidental DoS
@@ -33,27 +59,18 @@ DOCKER_ARGS+=(
 	-v "$WORKDIR:$WORKDIR" --workdir "$WORKDIR"
 	-e "AGENT_UID=$(id -u)" -e "AGENT_GID=$(id -g)"
 )
-if [[ -f "$ENV_FILE" ]]; then DOCKER_ARGS+=(--env-file "$ENV_FILE"); fi
 if [ -t 0 ]; then DOCKER_ARGS+=(-t); fi
+if [[ -f "$DOCKER_ENV" ]]; then DOCKER_ARGS+=(--env-file "$DOCKER_ENV"); fi
 
-[[ -n "$ENTER_SHELL" ]] || ARGS=(goose "${ARGS[@]}")
-
-VOLUMES=(
-	".config/goose"
-	".local/share/goose"
-	".local/state/goose"
-)
-exp_uids="$(id -u):$(id -g)"
-for vol in "${VOLUMES[@]}"; do
-	mkdir -p "$HOME/$vol"
-	owner="$(stat -c '%u:%g' "$HOME/$vol")"
-	if [[ "$owner" != "$exp_uids" ]]; then sudo chown "$exp_uids" "$HOME/$vol"; fi
-	DOCKER_ARGS+=(-v "$HOME/$vol:/home/agent/$vol")
+docker_add_volume "$WORKDIR" "$WORKDIR"
+for host_vol in "${HOST_VOLUMES[@]}"; do
+	# leave 2nd argument empty for auto container path
+	docker_add_volume "$host_vol"
 done
 
 docker network create -d bridge \
 	-o "com.docker.network.bridge.name"="d-ai-net" \
 	"$DOCKER_NET" &>/dev/null || true
 
-exec docker run "${DOCKER_ARGS[@]}" "$GOOSE_IMAGE" "${ARGS[@]}"
+exec docker run "${DOCKER_ARGS[@]}" "$DOCKER_GOOSE_IMAGE" "${CMD_ARGS[@]}"
 
