@@ -7,8 +7,10 @@ GPU_ROCM_GFX ?= gfx1100
 GPU_CUDA_VERSION ?= 13.3.1
 GPU_CUDA_ARCHITECTURES ?= 120
 
-LLAMACPP_GIT_URL = "https://github.com/TheTom/llama-cpp-turboquant.git"
-LLAMACPP_GIT_BRANCH = "feature/turboquant-kv-cache"
+# LLAMACPP_GIT_URL = "https://github.com/TheTom/llama-cpp-turboquant.git"
+# LLAMACPP_GIT_BRANCH = "feature/turboquant-kv-cache"
+LLAMACPP_GIT_URL = "https://github.com/ggml-org/llama.cpp.git"
+LLAMACPP_GIT_BRANCH = "master"
 
 LLAMACPP_ROCM_IMAGE = llama.cpp-rocm-$(GPU_ROCM_GFX)
 LLAMACPP_CUDA_IMAGE ?= llama.cpp-cuda
