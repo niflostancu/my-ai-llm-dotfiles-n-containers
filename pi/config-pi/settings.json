@@ -1,5 +1,6 @@
 {
   "packages": [
+    "npm:pi-zentui",
     "npm:pi-llama-cpp",
     "npm:pi-agent-extensions",
     "npm:pi-mcp-adapter",
@@ -8,5 +9,6 @@
     "npm:@mjasnikovs/pi-task",
     "git:github.com/DietrichGebert/ponytail"
   ],
-  "llamaServerUrl": "http://host.docker.internal:11444"
+  "llamaServerUrl": "http://host.docker.internal:11444",
+  "theme": "fzf-bat"
 }
