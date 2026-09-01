@@ -1,10 +1,9 @@
 {
   "packages": [
     "npm:pi-zentui",
-    "npm:pi-llama-cpp",
-    "npm:pi-agent-extensions",
-    "npm:pi-mcp-adapter",
     "npm:pi-thinking-box",
+    "npm:pi-llama-cpp",
+    "npm:pi-mcp-adapter",
     "npm:@ff-labs/pi-fff",
     "git:github.com/DietrichGebert/ponytail"
   ],
@@ -22,7 +21,6 @@
     "serverTimeout": 1000
   },
   "llamaServerUrl": "http://host.docker.internal:11444",
-  "theme": "fzf-bat",
   "quietStartup": false,
   "enableInstallTelemetry": false
 }
