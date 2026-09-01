@@ -6,9 +6,23 @@
     "npm:pi-mcp-adapter",
     "npm:pi-thinking-box",
     "npm:@ff-labs/pi-fff",
-    "npm:@mjasnikovs/pi-task",
     "git:github.com/DietrichGebert/ponytail"
   ],
+  "llamaSettings": {
+    "servers": [
+      {
+        "url": "http://host.docker.internal:11444",
+        "id": "local",
+        "name": "LocalLLama"
+      }
+    ],
+    "reactToModelSelect": true,
+    "autoloadOnMessage": false,
+    "pollingTimeout": 60000,
+    "serverTimeout": 1000
+  },
   "llamaServerUrl": "http://host.docker.internal:11444",
-  "theme": "fzf-bat"
+  "theme": "fzf-bat",
+  "quietStartup": false,
+  "enableInstallTelemetry": false
 }
