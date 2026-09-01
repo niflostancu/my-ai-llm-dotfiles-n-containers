@@ -41,7 +41,9 @@ LLAMA_CMAKE_ARGS=(
 	-DGPU_TARGETS="$LLAMA_GPU_TARGETS"
 	-DGGML_CUDA_FA_ALL_QUANTS=ON
 	# Vulkan support
-	#-DGGML_VULKAN=ON
+	-DGGML_VULKAN=ON
+	-DGGML_CPU_ALL_VARIANTS=ON
+	-DGGML_BACKEND_DL=ON
 	# prevent warnings / fixes 
 	-Wno-author
 	-DCMAKE_HIP_FLAGS="-Wno-unused-value"

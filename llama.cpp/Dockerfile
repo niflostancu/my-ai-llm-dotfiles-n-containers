@@ -12,10 +12,12 @@ ARG LLAMACPP_GIT_BRANCH=master
 # Install dependencies
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
-      ca-certificates curl git aria2 tar xz-utils procps \
-      build-essential cmake ninja-build npm \
-      libatomic1 libnuma-dev libgomp1 libelf1t64 libgoogle-perftools4 \
-      libdrm-dev zlib1g-dev libssl-dev libcurl4-openssl-dev \
+        ca-certificates curl git aria2 tar xz-utils procps \
+        build-essential cmake ninja-build npm \
+        libatomic1 libnuma-dev libgomp1 libelf1t64 libgoogle-perftools4 \
+        libdrm-dev zlib1g-dev libssl-dev libcurl4-openssl-dev \
+        # Vulkan SDK \
+        libxcb-xinput0 libxcb-xinerama0 libxcb-cursor-dev libvulkan-dev glslc spirv-headers \
     && rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
 
 # Download & unpack TheRock ROCm SDK to /opt/rocm (using script)
@@ -38,8 +40,11 @@ RUN /tmp/build_llama_rocm.sh
 FROM ubuntu:${UBUNTU_VERSION}
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-      ca-certificates curl tar xz-utils procps \
-      libatomic1 libnuma1 libgomp1 libstdc++6 \
+        ca-certificates curl tar xz-utils procps \
+        libatomic1 libnuma1 libgomp1 libstdc++6 \
+        # Vulkan SDK \
+        libxcb-xinput0 libxcb-xinerama0 libxcb-cursor0 libvulkan1 vulkan-tools glslc \
+        mesa-vulkan-drivers \
     && rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
 
 COPY --from=builder /opt/llama.cpp/ /opt/llama.cpp/
