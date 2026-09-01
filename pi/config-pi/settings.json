@@ -1,7 +1,9 @@
 {
   "packages": [
     "npm:pi-zentui",
+    "npm:@firstpick/pi-themes-bundle",
     "npm:pi-thinking-box",
+    "git:github.com/vedang/pi-prompt-history",
     "npm:pi-llama-cpp",
     "npm:pi-mcp-adapter",
     "npm:@ff-labs/pi-fff",
@@ -22,5 +24,6 @@
   },
   "llamaServerUrl": "http://host.docker.internal:11444",
   "quietStartup": false,
-  "enableInstallTelemetry": false
+  "enableInstallTelemetry": false,
+  "theme": "matrix"
 }

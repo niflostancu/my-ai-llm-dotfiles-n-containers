@@ -1,0 +1,6 @@
+{
+  "dbPath": "~/.local/shar/pi-agent/prompt-history/history.db",
+  "sessionDir": "~/.local/shar/pi-agent/sessions",
+  "maxResults": 20,
+  "primaryAction": "copy"
+}
