@@ -4,7 +4,7 @@
       "enabled": true,
       "style": "accent-rail",
       "colorSource": "theme",
-      "borderColorMode": "static",
+      "borderColorMode": "adaptive",
       "modelLabel": "id",
       "viewportIndicators": true,
       "styles": {
@@ -38,7 +38,7 @@
     },
     "userMessages": {
       "enabled": true,
-      "style": "framed",
+      "style": "framed-copy-friendly",
       "colorSource": "theme",
       "styles": {
         "framed": {},
@@ -58,7 +58,9 @@
       "colorSource": "theme",
       "messages": {
         "custom": true,
-        "values": [ "Working…" ]
+        "values": [
+          "Working…"
+        ]
       },
       "segments": {
         "tool": true,
@@ -77,15 +79,15 @@
           "responsive": true,
           "compactFormat": "$cwd$wrap(in $session_name)$wrap(on $git_branch) $git_status$wrap$context$wrap_sep$tokens",
           "compactMaxLines": 2,
-          "separator": "pipe",
+          "separator": "dot",
           "contextStyle": "text",
           "contextThresholds": {
             "warning": 70,
             "error": 90
           },
           "pathDisplay": {
-            "mode": "basename",
-            "depth": 0
+            "mode": "full",
+            "depth": 3
           },
           "segments": {
             "cwd": true,
@@ -98,9 +100,9 @@
             "runtime": true,
             "modelInfo": true,
             "context": true,
-            "tokens": true,
-            "cost": true,
-            "sessionDuration": false,
+            "tokens": false,
+            "cost": false,
+            "sessionDuration": true,
             "username": true,
             "time": false,
             "os": false,
@@ -121,7 +123,7 @@
           "extensionStatuses": {
             "defaultPlacement": "right",
             "placements": {
-              "mcp": "left",
+              "mcp": "off",
               "ponytail": "off"
             },
             "colorModes": {}
@@ -133,6 +135,10 @@
       "enabled": true,
       "style": "zentui",
       "colorSource": "theme"
+    },
+    "thinkingSteps": {
+      "enabled": false,
+      "mode": "rail"
     }
   },
   "icons": {
