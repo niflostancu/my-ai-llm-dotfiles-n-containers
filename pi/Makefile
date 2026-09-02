@@ -35,7 +35,8 @@ $(call add_docker_target,docker_little)
 
 install:
 	PI_SUFFIX=""; [ "$(PI_CFG)" = "pi" ] || PI_SUFFIX="-$(PI_CFG)"; \
-		rsync -avh "./config-$(PI_CFG)/" "$(HOME)/.config/pi-agent$$PI_SUFFIX/"
+		rsync -avh --exclude="node_modules/" \
+			"./config-$(PI_CFG)/" "$(HOME)/.config/pi-agent$$PI_SUFFIX/"
 	echo "PI_CFG=$(PI_CFG)" > "$(HOME)/.config/pi-agent-default.env"
 	install -m0755 -d "$(XDG_DATA_HOME)/ai-agent/lib"
 	install -m0755 "../base/docker-helpers.sh" "$(XDG_DATA_HOME)/ai-agent/lib/"

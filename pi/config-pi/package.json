@@ -1,0 +1,24 @@
+{
+  "name": "my-pi-extensions",
+  "private": true,
+	"type": "module",
+	"workspaces": [
+		"extensions/*"
+	],
+  "scripts": {
+    "check": "npm run format:check && npm run typecheck && npm test && npm run package:check --workspaces --if-present",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+		"@earendil-works/pi-ai": "latest",
+		"@earendil-works/pi-coding-agent": "latest",
+		"@earendil-works/pi-tui": "latest"
+  },
+	"engines": {
+		"bun": ">=1.1.0"
+	}
+}
+
