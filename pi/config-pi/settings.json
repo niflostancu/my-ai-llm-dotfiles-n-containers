@@ -23,7 +23,7 @@
     "serverTimeout": 1000
   },
   "llamaServerUrl": "http://host.docker.internal:11444",
-  "quietStartup": false,
+  "quietStartup": true,
   "enableInstallTelemetry": false,
   "theme": "matrix"
 }
