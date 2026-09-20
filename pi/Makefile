@@ -35,8 +35,15 @@ $(call add_docker_target,docker_little)
 
 install:
 	PI_SUFFIX=""; [ "$(PI_CFG)" = "pi" ] || PI_SUFFIX="-$(PI_CFG)"; \
-		rsync -avh --exclude="node_modules/" \
-			"./config-$(PI_CFG)/" "$(HOME)/.config/pi-agent$$PI_SUFFIX/"
+		rsync -avh --exclude="node_modules/" --exclude="settings.tpl.json" \
+			"./config-$(PI_CFG)/" "$(HOME)/.config/pi-agent$$PI_SUFFIX/"; \
+	RUNTIME="$(HOME)/.config/pi-agent$$PI_SUFFIX/settings.json"; \
+	TEMPLATE="./config-$(PI_CFG)/settings.tpl.json"; \
+	if [ -f "$$RUNTIME" ]; then \
+		jq -s '.[0] * .[1]' "$$RUNTIME" "$$TEMPLATE" > "$$RUNTIME.tmp" && mv "$$RUNTIME.tmp" "$$RUNTIME"; \
+	else \
+		jq '.' "$$TEMPLATE" > "$$RUNTIME"; \
+	fi; \
 	echo "PI_CFG=$(PI_CFG)" > "$(HOME)/.config/pi-agent-default.env"
 	install -m0755 -d "$(XDG_DATA_HOME)/ai-agent/lib"
 	install -m0755 "../base/docker-helpers.sh" "$(XDG_DATA_HOME)/ai-agent/lib/"
