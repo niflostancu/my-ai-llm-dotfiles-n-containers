@@ -45,7 +45,5 @@ install:
 		jq '.' "$$TEMPLATE" > "$$RUNTIME"; \
 	fi; \
 	echo "PI_CFG=$(PI_CFG)" > "$(HOME)/.config/pi-agent-default.env"
-	install -m0755 -d "$(XDG_DATA_HOME)/ai-agent/lib"
-	install -m0755 "../base/docker-helpers.sh" "$(XDG_DATA_HOME)/ai-agent/lib/"
-	install -m0755 "pi-agent.sh" "$(HOME)/.local/bin"
+	ln -sf "$(abspath pi-agent.sh)" "$(HOME)/.local/bin/pi-agent.sh"
 

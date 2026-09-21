@@ -22,7 +22,5 @@ GOOSE_AGENT_HOME ?= goose
 
 install:
 	rsync -avh "./config/" "$(HOME)/.config/$(GOOSE_AGENT_HOME)/"
-	install -m0755 -d "$(XDG_DATA_HOME)/ai-agent/lib"
-	install -m0755 "../base/docker-helpers.sh" "$(XDG_DATA_HOME)/ai-agent/lib/"
-	install -m0755 "goose-agent.sh" "$(HOME)/.local/bin"
+	ln -sf "$(abspath goose-agent.sh)" "$(HOME)/.local/bin/goose-agent.sh"
 

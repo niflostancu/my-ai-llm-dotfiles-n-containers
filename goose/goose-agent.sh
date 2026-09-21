@@ -2,13 +2,9 @@
 # Goose Agent (containerized using Docker)
 set -eo pipefail
 
-SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
+SCRIPT_DIR=$(cd -- "$(dirname -- "$(realpath -e "${BASH_SOURCE[0]}")")" &>/dev/null && pwd)
 
-if [[ -f "$SCRIPT_DIR/../base/docker-helpers.sh" ]]; then
-	source "$SCRIPT_DIR/../base/docker-helpers.sh"
-else
-	source "${XDG_DATA_HOME:-$HOME/.local/share}/ai-agent/lib/docker-helpers.sh"
-fi
+source "$SCRIPT_DIR/../base/docker-helpers.sh"
 
 # defaults
 # extract relative path to use as project workdir inside container
