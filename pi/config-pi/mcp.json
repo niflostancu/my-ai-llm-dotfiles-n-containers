@@ -1,17 +1,5 @@
 {
   "mcpServers": {
-    "code-index-mcp": {
-      "command": "uvx",
-      "args": ["code-index-mcp"],
-      "directTools": [
-        "set_project_path",
-        "search_code_advanced",
-        "get_file_summary",
-        "get_symbol_body",
-        "refresh_index",
-        "build_deep_index"
-      ]
-    },
     "ketch": {
       "command": "ketch",
       "args": ["mcp", "serve"],

@@ -116,12 +116,3 @@ extensions:
     timeout: 300
     socket: null
     bundled: null
-
-  code-index-mcp:
-    enabled: true
-    type: stdio
-    name: code-index-mcp
-    cmd: uvx
-    args: ["code-index-mcp"]
-    timeout: 300
-
