@@ -1,6 +1,7 @@
 # Local environment
 .env
 *.local.*
+_experiments/
 
 # Build artifacts
 build/
