@@ -7,6 +7,7 @@
     "npm:pi-llama-cpp",
     "npm:pi-mcp-adapter",
     "npm:@ff-labs/pi-fff",
+    "npm:pi-cymbal",
     "npm:@mjakl/pi-subagent",
     "git:github.com/DietrichGebert/ponytail"
   ],
