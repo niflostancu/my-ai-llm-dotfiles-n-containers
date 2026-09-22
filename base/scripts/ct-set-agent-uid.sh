@@ -12,7 +12,7 @@ if [ -n "$AGENT_UID" ]; then
 	groupmod -g "$AGENT_GID" ai-agents
 	usermod -u "$AGENT_UID" agent
 
-	# fix ownership of home
-	chown -R "${AGENT_UID}:${AGENT_GID}" /home/agent
+	# fix ownership of agent home (but do not cross mountpoints)
+	find /home/agent -xdev -exec chown "${AGENT_UID}:${AGENT_GID}" '{}' '+'
 fi
 
