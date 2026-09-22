@@ -7,6 +7,7 @@ echo 'Hello from new entry!'
 # generate random secret key if not already present
 CONFIG_TEMPLATE="/usr/local/searxng/settings.template.yml"
 USER_CONFIG="/etc/searxng-user/settings.yml"
+# Note: __SEARXNG_* envs exported by https://codeberg.org/searxng/base
 SECRETS_TARGET="$__SEARXNG_DATA_PATH/secrets.yml"
 CONFIG_TARGET="$__SEARXNG_CONFIG_PATH/settings.yml"
 
