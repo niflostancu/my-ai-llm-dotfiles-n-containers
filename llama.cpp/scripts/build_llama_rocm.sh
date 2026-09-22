@@ -50,7 +50,7 @@ LLAMA_CMAKE_ARGS=(
 )
 
 cmake -S . -B build -G Ninja "${LLAMA_CMAKE_ARGS[@]}"
-cmake --build build -- -j "$(ncpu --ignore=2)"
+cmake --build build -- -j "$(nproc --ignore=2)"
 
 # install to prefix & remove build files
 cmake --install build

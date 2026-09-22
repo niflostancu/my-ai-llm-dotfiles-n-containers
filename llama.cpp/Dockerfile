@@ -3,7 +3,7 @@
 ARG UBUNTU_VERSION=26.04
 FROM ubuntu:${UBUNTU_VERSION} AS builder
 
-ARG ROCM_VERSION_PREFIX=7
+ARG ROCM_VERSION_PREFIX=10
 ARG ROCM_GFX=gfx110X
 
 ARG LLAMACPP_GIT_URL=https://github.com/ggml-org/llama.cpp.git
@@ -23,7 +23,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Download & unpack TheRock ROCm SDK to /opt/rocm (using script)
 WORKDIR /tmp
 COPY --chmod=755 scripts/install_rocm_sdk.sh /tmp/install_rocm_sdk.sh
-RUN ROCM_VERSION_PREFIX=${ROCM_VERSION_PREFIX} ROCM_GFX=${ROCM_GFX} /tmp/install_rocm_sdk.sh
+RUN --mount=type=cache,target=/var/build-cache/  \
+    ROCM_VERSION_PREFIX=${ROCM_VERSION_PREFIX} ROCM_GFX=${ROCM_GFX} /tmp/install_rocm_sdk.sh
 
 ENV ROCM_PATH=/opt/rocm HIP_PATH=/opt/rocm HIP_PLATFORM=amd \
     PATH=/opt/rocm/bin:/opt/rocm/llvm/bin:$PATH \
@@ -52,6 +53,7 @@ COPY --from=builder /opt/llama.cpp/ /opt/llama.cpp/
 COPY --from=builder /opt/rocm/lib/libamdhip64.so* \
     /opt/rocm/lib/libhsa-*.so* /opt/rocm/lib/libhipblas*.so* \
     /opt/rocm/lib/libroc*.so* /opt/rocm/lib/libamd_comgr*.so* \
+    /opt/rocm/lib/liborigami.so* \
     /opt/rocm/lib/
 COPY --from=builder /opt/rocm/llvm/lib/*.so* /opt/rocm/llvm/lib/
 COPY --from=builder /opt/rocm/lib/rocm_sysdeps/ /opt/rocm/lib/rocm_sysdeps

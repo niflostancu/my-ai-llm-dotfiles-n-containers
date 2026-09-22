@@ -4,21 +4,22 @@
 set -euo pipefail
 set -x
 
-ROCM_VERSION_PATTERN="${ROCM_VERSION_PATTERN:-"all-7\."}"
+ROCM_VERSION_PREFIX=${ROCM_VERSION_PREFIX:-10}
+ROCM_VERSION_PATTERN="${ROCM_VERSION_PATTERN:-"all-$ROCM_VERSION_PREFIX\\."}"
 ROCM_GFX="${ROCM_GFX:-gfx110X}"
 
 echo "=== Installing TheRock ROCm SDK ($ROCM_GFX, major version $ROCM_VERSION_PATTERN) ==="
 
-cd /tmp
+cd /var/build-cache/
 
-THEROCK_BASE="https://therock-nightly-tarball.s3.amazonaws.com"
+THEROCK_BASE="https://stable.repo.amd.com/rocm/core/tarball/"
 THEROCK_TARBALL_PFX="therock-dist-linux-${ROCM_GFX}-"
 
 # resolve latest tarball key from S3 bucket listing
 # Note: this returns XML, uses ugly bash hack to "parse" it
-KEY="$(curl -s "${THEROCK_BASE}?list-type=2&prefix=${THEROCK_TARBALL_PFX}" \
+KEY="$(curl -s "${THEROCK_BASE}" \
     | tr '<' '\n' \
-    | grep -o "${THEROCK_TARBALL_PFX}${ROCM_VERSION_PATTERN}.*\.tar\.gz" \
+    | grep -oP "${THEROCK_TARBALL_PFX}${ROCM_VERSION_PATTERN}.*?\\.tar\\.gz" \
     | sort -V | tail -n1 || true)"
 
 if [ -z "$KEY" ]; then
@@ -26,12 +27,16 @@ if [ -z "$KEY" ]; then
   exit 1
 fi
 
-echo "Downloading tarball: ${KEY}"
-aria2c -x 16 -s 16 -j 16 --file-allocation=none "${THEROCK_BASE}/${KEY}" -o therock.tar.gz
+ROCM_ARCHIVE=$(basename "$KEY")
 
+if [[ -f "$ROCM_ARCHIVE" ]]; then
+    echo "$ROCM_ARCHIVE already found in build cache ;)"
+else
+    echo "Downloading tarball: ${KEY}"
+    aria2c -x 16 -s 16 -j 16 --file-allocation=none "${THEROCK_BASE}${KEY}" -o "$ROCM_ARCHIVE"
+fi
 mkdir -p /opt/rocm
-tar xzf therock.tar.gz -C /opt/rocm --strip-components=1
-rm therock.tar.gz
+tar xzf "$ROCM_ARCHIVE" -C /opt/rocm --strip-components=1
 
 echo "Optimizing ROCm package (removing unneeded files)..."
 (
