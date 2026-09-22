@@ -16,9 +16,4 @@ ENV PATH="/home/agent/go/bin:/home/agent/.bun/bin:$PATH" \
 COPY --chmod=755 devcontainer/feature/install.sh /tmp/install-devcontainer.sh
 RUN --mount=from=mcp-addons,target=/tmp/mcp-addons \
 	VARIANT="${VARIANT}" AGENT_BASE_INSTALLED=1 /tmp/install-devcontainer.sh \
-    && rm /tmp/install-devcontainer.sh
-
-WORKDIR /workspace
-ENV PATH=":$PATH"
-
-RUN rm -rf /tmp/*
+    && rm -rf /tmp/* || true

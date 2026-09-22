@@ -14,7 +14,8 @@ ENV LANG=en_US.UTF-8 \
 
 COPY --chmod=755 scripts/ /usr/local/bin/
 ENTRYPOINT ["/usr/local/bin/entrypoint-base.sh"]
-WORKDIR /workspace
+WORKDIR /tmp
+
 # note: entrypoint will run the command as `agent`
 CMD ["/bin/bash"]
 
