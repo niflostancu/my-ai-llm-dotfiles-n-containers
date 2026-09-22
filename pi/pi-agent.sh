@@ -20,6 +20,15 @@ DOCKER_PI_IMAGE=${DOCKER_PI_IMAGE:-"personal/ai-ag-pi${_PI_SUFFIX}"}
 DOCKER_USERNAME=agent
 DOCKER_NET=ai-agents-net
 
+# devcontainer project support: if the project ships a .devcontainer config,
+# build an image from it with the pi-agent feature injected
+DC_JSON="$WORKDIR/.devcontainer/devcontainer.json"
+if [[ -f "$DC_JSON" && ${PI_DEVCONTAINER:-1} == 1 ]]; then
+	source "$SCRIPT_DIR/devcontainer/build.sh"
+	DOCKER_PI_IMAGE="${DOCKER_PI_IMAGE%/*}/ai-ag-pi-$NAME"
+	build_dc_image "$WORKDIR" "$DOCKER_PI_IMAGE"
+fi
+
 # use separate home config paths for the different cfg variants
 PI_AGENT_DIR=${PI_AGENT_DIR:-"pi-agent${_PI_SUFFIX}"}
 PI_AGENT_HOME=${PI_AGENT_HOME:-"$HOME/.config/${PI_AGENT_DIR}"}
@@ -62,6 +71,8 @@ DOCKER_ARGS+=(
 	--add-host=host.docker.internal:host-gateway
 	--workdir "$WORKDIR"
 	-e "AGENT_UID=$(id -u)" -e "AGENT_GID=$(id -g)"
+	# PI envs for completeness (i.e., devcontainer-built images)
+	-e "PI_CODING_AGENT_DIR=/home/agent/.config/pi-agent${_PI_SUFFIX}"
 )
 if [ -t 0 ]; then DOCKER_ARGS+=(-t); fi
 if [[ -f "$DOCKER_ENV" ]]; then DOCKER_ARGS+=(--env-file "$DOCKER_ENV"); fi

@@ -1,0 +1,23 @@
+{
+	"name": "pi-agent",
+	"id": "personal-pi-agent",
+	"version": "1.0.0",
+	"description": "Pi coding agent with customized config. Debian-based images only.",
+	"options": {
+		"variant": {
+			"type": "string",
+			"default": "pi",
+			"description": "Agent config/variant to install: e.g.: pi/omp/little"
+		}
+	},
+	"entrypoint": {
+		"type": "exec",
+		"value": ["/usr/local/bin/agent-entrypoint.sh"]
+	},
+	"containerEnv": {
+    	"HOME": "/home/agent",
+    	"PATH": "/home/agent/go/bin:/home/agent/.bun/bin:/usr/local/go/bin:${PATH}",
+		"PI_CODING_AGENT_DIR": "/home/agent/.config/pi-agent",
+		"PI_CODING_AGENT_SESSION_DIR": "/home/agent/.local/share/pi-agent/sessions"
+	}
+}

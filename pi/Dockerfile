@@ -4,38 +4,21 @@ ARG BASE_IMAGE="personal/ai-agent-base"
 
 FROM ${BASE_IMAGE} AS pi
 
-# install extra packages?
-#RUN export DEBIAN_FRONTEND="noninteractive"; \
-# 	apt-get update && apt-get install -y \
-# 		 neovim \
-# 	&& rm -rf /var/lib/apt/lists/*
+ARG VARIANT=pi
 
-ENV PATH="/home/agent/.bun/bin:$PATH" \
+WORKDIR /tmp
+
+ENV PATH="/home/agent/go/bin:/home/agent/.bun/bin:$PATH" \
 	PI_CODING_AGENT_DIR="${HOME}/.config/pi-agent" \
  	PI_CODING_AGENT_SESSION_DIR="${HOME}/.local/share/pi-agent/sessions"
 
-# install pi-coding-agent
-RUN gosu agent bun install -g --ignore-scripts @earendil-works/pi-coding-agent && \
-	gosu agent bun install -g pi-acp
-
-# install custom shared tools
+# reuse the devcontainer layer install script
+COPY --chmod=755 devcontainer/feature/install.sh /tmp/install-devcontainer.sh
 RUN --mount=from=mcp-addons,target=/tmp/mcp-addons \
-	cd /tmp/mcp-addons/code-index-mcp && ./install.sh && \
-	cd /tmp/mcp-addons/ketch && ./install.sh
+	VARIANT="${VARIANT}" AGENT_BASE_INSTALLED=1 /tmp/install-devcontainer.sh \
+    && rm /tmp/install-devcontainer.sh
 
-ENV PATH="/home/agent/go/bin:$PATH"
+WORKDIR /workspace
+ENV PATH=":$PATH"
 
 RUN rm -rf /tmp/*
-
-FROM pi AS omp
-
-RUN curl -fsSL https://omp.sh/install | \
-	PI_INSTALL_DIR=/usr/local/bin sh -s -- --binary
-
-FROM pi AS little
-
-ENV LITTLE_CODER_MODELS_FILE="$PI_CODING_AGENT_DIR/models.json" \
-	LITTLE_CODER_EXTENSIONS_DIR="$PI_CODING_AGENT_DIR/extensions"
-
-RUN gosu agent bun install -g little-coder
-

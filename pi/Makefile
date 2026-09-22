@@ -12,15 +12,15 @@ docker_pi_args = \
 
 docker_pi-image-name = ai-ag-pi
 docker_pi-dockerfile = Dockerfile
-docker_pi-buildx-args = $(docker_pi_args) --target "pi"
+docker_pi-buildx-args = $(docker_pi_args) --build-arg VARIANT=pi
 
 docker_omp-image-name = ai-ag-pi-omp
 docker_omp-dockerfile = Dockerfile
-docker_omp-buildx-args = $(docker_pi_args) --target "omp"
+docker_omp-buildx-args = $(docker_pi_args)  --build-arg VARIANT=omp
 
 docker_little-image-name = ai-ag-pi-little
 docker_little-dockerfile = Dockerfile
-docker_little-buildx-args = $(docker_pi_args) --target "little"
+docker_little-buildx-args = $(docker_pi_args) --build-arg VARIANT=little
 
 -include ../config.local.mk
 include ../base/_docker_lib.mk
