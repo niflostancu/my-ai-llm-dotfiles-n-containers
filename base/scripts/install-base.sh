@@ -19,6 +19,8 @@ fi
 
 MINIMAL_PACKAGES=(
 	bash gosu rsync ca-certificates curl wget git python3 python3-pip
+	# build tools required for cgo / treesitter-based tools
+	build-essential make
 	# Linux CLI tools (used as agent tools)
 	ripgrep fd-find bat jq zip unzip xz-utils tree file locales
 )
