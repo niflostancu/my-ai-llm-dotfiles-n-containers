@@ -23,10 +23,12 @@ DOCKER_NET=ai-agents-net
 # devcontainer project support: if the project ships a .devcontainer config,
 # build an image from it with the pi-agent feature injected
 DC_JSON="$WORKDIR/.devcontainer/devcontainer.json"
+DC_BUILT=0
 if [[ -f "$DC_JSON" && ${PI_DEVCONTAINER:-1} == 1 ]]; then
 	source "$SCRIPT_DIR/devcontainer/build.sh"
 	DOCKER_PI_IMAGE="${DOCKER_PI_IMAGE%/*}/ai-ag-pi-$NAME"
 	build_dc_image "$WORKDIR" "$DOCKER_PI_IMAGE"
+	DC_BUILT=1
 fi
 
 # use separate home config paths for the different cfg variants
@@ -86,5 +88,12 @@ done
 docker network create -d bridge \
 	-o "com.docker.network.bridge.name"="d-ai-net" \
 	"$DOCKER_NET" &>/dev/null || true
+
+# devcontainer-built images don't get the feature's entrypoint baked into the
+# image metadata (it's only stored in the devcontainer.metadata label), so
+# invoke the agent entrypoint explicitly (required to set UIDs + su to 'agent')
+if [[ "$DC_BUILT" == 1 ]]; then
+	CMD_ARGS=("/usr/local/bin/agent-entrypoint.sh" "${CMD_ARGS[@]}")
+fi
 
 exec docker run "${DOCKER_ARGS[@]}" "$DOCKER_PI_IMAGE" "${CMD_ARGS[@]}"

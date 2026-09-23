@@ -8,12 +8,14 @@
 			"type": "string",
 			"default": "pi",
 			"description": "Agent config/variant to install: e.g.: pi/omp/little"
+		},
+		"AGENT_BASE_INSTALLED": {
+			"type": "string",
+			"default": "",
+			"description": "Set to 1 when building on top of a personal ai-ag-base/pi image (skips base deps install)"
 		}
 	},
-	"entrypoint": {
-		"type": "exec",
-		"value": ["/usr/local/bin/agent-entrypoint.sh"]
-	},
+	"entrypoint": "/usr/local/bin/agent-entrypoint.sh",
 	"containerEnv": {
     	"HOME": "/home/agent",
     	"PATH": "/home/agent/go/bin:/home/agent/.bun/bin:/usr/local/go/bin:${PATH}",
