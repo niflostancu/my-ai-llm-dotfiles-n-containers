@@ -32,6 +32,7 @@ build_dc_image() {
 	# stage the pi feature context (shared sources, no duplication)
 	feat="$stage/.devcontainer/pi-agent"
 	mkdir -p "$feat/mcp-addons"
+	rsync -a --exclude=devcontainer.json "$workdir/.devcontainer/" "$stage/.devcontainer/"
 	cp -r "$dc_dir/feature/." "$feat/"
 	for d in "$dc_repo_root"/mcp-servers/*/; do
 		[[ -f "$d/install.sh" ]] && cp -r "$d" "$feat/mcp-addons/"
@@ -39,7 +40,7 @@ build_dc_image() {
 	cp -r "$dc_repo_root/base/scripts" "$feat/scripts"
 
 	# merge project config + pi feature; absolutize relative paths
-	jq --arg proj "$workdir" --arg variant "${PI_CFG:-pi}" '
+	jq --arg proj "$workdir/.devcontainer" --arg variant "${PI_CFG:-pi}" '
 		.features = ((.features // {})
 			| with_entries(if .value.path? then
 					.value.path = (if (.value.path | startswith("/"))
@@ -49,8 +50,8 @@ build_dc_image() {
 				else . end)
 			+ {"./pi-agent": {"variant": $variant}})
 		| if .build then
-			.build.context = (if (.build.context | startswith("/"))
-				then .build.context
+			.build.context = (if (.build.context // "." | startswith("/"))
+				then (.build.context // ".")
 				else ($proj + "/" + (.build.context // "."))
 				end)
 			| if .build.dockerfile? then
