@@ -89,11 +89,61 @@ docker network create -d bridge \
 	-o "com.docker.network.bridge.name"="d-ai-net" \
 	"$DOCKER_NET" &>/dev/null || true
 
-# devcontainer-built images don't get the feature's entrypoint baked into the
-# image metadata (it's only stored in the devcontainer.metadata label), so
-# invoke the agent entrypoint explicitly (required to set UIDs + su to 'agent')
+# DevContainer-specific docker args injection
+# Processing devcontainer.json format in bash (with AI-assisted code),
+# please God forgive me!
 if [[ "$DC_BUILT" == 1 ]]; then
+	# devcontainer-built images don't get the feature's entrypoint baked into the
+	# image metadata (it's only stored in the devcontainer.metadata label), so
+	# invoke the agent entrypoint explicitly (required to set UIDs + su to 'agent')
 	CMD_ARGS=("/usr/local/bin/agent-entrypoint.sh" "${CMD_ARGS[@]}")
+
+	# expand devcontainer.json variables (https://containers.dev/implementors/json_reference/):
+	# ${localEnv:NAME}, ${env:NAME}, ${containerEnv:NAME} (each with optional :default),
+	# ${localWorkspaceFolder(Basename)}, ${containerWorkspaceFolder(Basename)}, ${containerUserHomeFolder}
+	_dc_clean=$(sed '/^[[:space:]]*\/\//d' "$DC_JSON")
+	_dc_expand() {
+		local s=$1 k rest name def v;
+		while [[ $s =~ \$\{([A-Za-z_][A-Za-z0-9_]*)(:([^}]*))?\} ]]; do
+			k=${BASH_REMATCH[1]}; rest=${BASH_REMATCH[3]-}
+			case $k in
+				localEnv|env)
+					if [[ $rest == *":"* ]]; then
+						name=${rest%%:*}; def=${rest#*:}
+						v=${!name}; [[ -n $v ]] || v=$def
+					else v=${!rest-}; fi ;;
+				containerEnv)
+					v=$(jq -r --arg k "${rest%%:*}" '.containerEnv[$k] // empty' <<<"$_dc_clean")
+					[[ -n $v || $rest != *":"* ]] || v=${rest#*:} ;;
+				localWorkspaceFolder|containerWorkspaceFolder) v=$WORKDIR ;;
+				localWorkspaceFolderBasename|containerWorkspaceFolderBasename) v=$(basename "$WORKDIR") ;;
+				containerUserHomeFolder) v=/home/agent ;;
+				*) v= ;;   # unknown (e.g. ${secret:...}): leave empty
+			esac
+			if [[ $v == *"\${$k"* ]]; then v=; fi   # no recursive expansion
+			s=${s/"\${$k${rest:+:$rest}}"/$v}
+		done
+		printf '%s' "$s"
+	}
+	# honor devcontainer runArgs (e.g. --device /dev/kvm), variables expanded
+	while IFS= read -r a; do DOCKER_ARGS+=("$(_dc_expand "$a")"); done < <(jq -r '.runArgs[]?' <<<"$_dc_clean")
+	# mounts: "source=...,target=...,type=bind|volume" (keys in any order)
+	while IFS=$'\t' read -r src tgt typ; do
+		[[ -n "$src" ]] || continue
+		src=$(_dc_expand "$src"); tgt=$(_dc_expand "$tgt")
+		if [[ "$typ" == volume ]]; then
+			DOCKER_ARGS+=(--mount "type=volume,source=$src,target=$tgt")
+		else
+			# bind: ~ → host $HOME (source) / container home (target), relative source → workdir
+			src=${src/#\~/$HOME}
+			[[ "$src" != /* ]] && src="$WORKDIR/$src"
+			tgt=${tgt/#\~//home/agent}
+			DOCKER_ARGS+=(-v "$src:$tgt")
+			echo "ADD MOUNT: $src:$tgt"
+		fi
+	done < <(jq -r '.mounts[]? | (split(",") | map(capture("^(?<k>[^=]+)=(?<v>.*)$")) |
+		map({key:.k, value:.v}) | from_entries) as $m |
+		[$m.source, $m.target, ($m.type // "bind")] | @tsv' <<<"$_dc_clean")
 fi
 
 exec docker run "${DOCKER_ARGS[@]}" "$DOCKER_PI_IMAGE" "${CMD_ARGS[@]}"
