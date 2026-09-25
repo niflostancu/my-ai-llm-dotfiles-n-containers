@@ -36,11 +36,11 @@ build_dc_image() {
 	# stage the pi feature context (shared sources, no duplication)
 	feat="$stage/.devcontainer/pi-agent"
 	mkdir -p "$feat/mcp-addons"
-	cp -r "$dc_dir/feature/." "$feat/"
+	rsync -a "$dc_dir/feature/" "$feat/"
 	for d in "$dc_repo_root"/mcp-servers/*/; do
-		[[ -f "$d/install.sh" ]] && cp -r "$d" "$feat/mcp-addons/"
+		[[ -f "$d/install.sh" ]] && rsync -a "$d/" "$feat/mcp-addons/"
 	done
-	cp -r "$dc_repo_root/base/scripts" "$feat/scripts"
+	rsync -a "$dc_repo_root/base/scripts/" "$feat/scripts/"
 
 	# merge project config + pi feature into the staging dir
 	jq --arg variant "${PI_CFG:-pi}" '
