@@ -27,40 +27,23 @@ build_dc_image() {
 	local stage feat
 	mkdir -p "$XDG_CACHE_HOME/ai-agent/"
 	stage=$(mktemp -d "${XDG_CACHE_HOME}/ai-agent/$(basename "$workdir")-tmp.XXXXXX")
-	#trap 'rm -rf "$stage"' EXIT
+	trap 'rm -rf "$stage"' EXIT
+
+	# stage the whole workspace dir (since it may get used in building the container)
+	rsync -a "$workdir/" "$stage/"
 
 	# stage the pi feature context (shared sources, no duplication)
 	feat="$stage/.devcontainer/pi-agent"
 	mkdir -p "$feat/mcp-addons"
-	rsync -a --exclude=devcontainer.json "$workdir/.devcontainer/" "$stage/.devcontainer/"
 	cp -r "$dc_dir/feature/." "$feat/"
 	for d in "$dc_repo_root"/mcp-servers/*/; do
 		[[ -f "$d/install.sh" ]] && cp -r "$d" "$feat/mcp-addons/"
 	done
 	cp -r "$dc_repo_root/base/scripts" "$feat/scripts"
 
-	# merge project config + pi feature; absolutize relative paths
-	jq --arg proj "$workdir/.devcontainer" --arg variant "${PI_CFG:-pi}" '
-		.features = ((.features // {})
-			| with_entries(if .value.path? then
-					.value.path = (if (.value.path | startswith("/"))
-						then .value.path
-						else ($proj + "/" + (.value.path | ltrimstr("./")))
-						end)
-				else . end)
-			+ {"./pi-agent": {"variant": $variant}})
-		| if .build then
-			.build.context = (if (.build.context // "." | startswith("/"))
-				then (.build.context // ".")
-				else ($proj + "/" + (.build.context // "."))
-				end)
-			| if .build.dockerfile? then
-				.build.dockerfile = (if (.build.dockerfile | startswith("/"))
-					then .build.dockerfile
-					else ($proj + "/" + .build.dockerfile)
-					end)
-			  else . end
-		  else . end' \
+	# merge project config + pi feature into the staging dir
+	jq --arg variant "${PI_CFG:-pi}" '
+		.features = ((.features // {}) + {"./pi-agent": {"variant": $variant}})' \
 		<(sed '/^[[:space:]]*\/\//d' "$workdir/.devcontainer/devcontainer.json") \
 		> "$stage/.devcontainer/devcontainer.json"
 	# (yep, strip JSONC comments from devcontainer.json, if any)
