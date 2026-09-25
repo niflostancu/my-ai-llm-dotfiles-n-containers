@@ -26,8 +26,9 @@ build_dc_image() {
 	local workdir=$1 image=$2
 	local stage feat
 	mkdir -p "$XDG_CACHE_HOME/ai-agent/"
-	stage=$(mktemp -d "${XDG_CACHE_HOME}/ai-agent/$(basename "$workdir")-tmp.XXXXXX")
-	trap 'rm -rf "$stage"' EXIT
+	# use dir name prefix + sha256 of the absolute path
+	stage="$XDG_CACHE_HOME/ai-agent/$(basename "$workdir")-$(printf '%s' "$workdir" \
+		| sha256sum | cut -c1-10)"
 
 	# stage the whole workspace dir (since it may get used in building the container)
 	rsync -a "$workdir/" "$stage/"
