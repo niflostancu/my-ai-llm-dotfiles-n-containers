@@ -1,10 +1,10 @@
 #!/bin/sh
 set -e
 
-ct-set-agent-uid.sh
+. /usr/local/bin/ct-set-agent-uid.sh
 
 if [ "$1" = "--root-shell" ]; then
 	exec /usr/bin/bash
 fi
-exec gosu agent "$@"
+exec gosu "${AGENT_USER:-agent}" "$@"
 

@@ -96,7 +96,7 @@ if [[ "$DC_BUILT" == 1 ]]; then
 	# devcontainer-built images don't get the feature's entrypoint baked into the
 	# image metadata (it's only stored in the devcontainer.metadata label), so
 	# invoke the agent entrypoint explicitly (required to set UIDs + su to 'agent')
-	CMD_ARGS=("/usr/local/bin/agent-entrypoint.sh" "${CMD_ARGS[@]}")
+	DOCKER_ARGS+=(--entrypoint "/usr/local/bin/agent-entrypoint.sh")
 	# inject runArgs/mounts from devcontainer.json into DOCKER_ARGS
 	source "$SCRIPT_DIR/devcontainer/dc-args.sh"
 	dc_run_args "$DC_JSON" "$WORKDIR"
