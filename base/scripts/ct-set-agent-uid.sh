@@ -23,7 +23,6 @@ if [ -n "$AGENT_UID" ]; then
 		if getent group "$AGENT_GID" >/dev/null; then
 			usermod -g "$AGENT_GID" agent
 		else
-			echo SA O FUT PE MAM TA
 			groupmod -g "$AGENT_GID" ai-agents
 		fi
 		[ "$(id -u agent)" = "$AGENT_UID" ] || usermod -u "$AGENT_UID" agent
