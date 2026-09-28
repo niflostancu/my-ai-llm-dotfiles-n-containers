@@ -97,6 +97,12 @@ if [[ "$DC_BUILT" == 1 ]]; then
 	# image metadata (it's only stored in the devcontainer.metadata label), so
 	# invoke the agent entrypoint explicitly (required to set UIDs + su to 'agent')
 	DOCKER_ARGS+=(--entrypoint "/usr/local/bin/agent-entrypoint.sh")
+	# send original project's entrypoint as env, for chain-calling
+	_orig_ep=$(docker image inspect --format '{{json .Config.Entrypoint}}' \
+		"${DOCKER_PI_IMAGE}" 2>/dev/null) || _orig_ep=""
+	if [[ -n "$_orig_ep" && "$_orig_ep" != "null" ]]; then
+		DOCKER_ARGS+=(-e "PI_ORIG_ENTRYPOINT=$_orig_ep")
+	fi
 	# inject runArgs/mounts from devcontainer.json into DOCKER_ARGS
 	source "$SCRIPT_DIR/devcontainer/dc-args.sh"
 	dc_run_args "$DC_JSON" "$WORKDIR"

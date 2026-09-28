@@ -42,12 +42,14 @@ build_dc_image() {
 	done
 	rsync -a "$dc_repo_root/base/scripts/" "$feat/scripts/"
 
+	# (yep, strip JSONC comments from devcontainer.json, if any)
+	local dc_json
+	dc_json=$(sed '/^[[:space:]]*\/\//d' "$workdir/.devcontainer/devcontainer.json")
+
 	# merge project config + pi feature into the staging dir
 	jq --arg variant "${PI_CFG:-pi}" '
 		.features = ((.features // {}) + {"./pi-agent": {"variant": $variant}})' \
-		<(sed '/^[[:space:]]*\/\//d' "$workdir/.devcontainer/devcontainer.json") \
-		> "$stage/.devcontainer/devcontainer.json"
-	# (yep, strip JSONC comments from devcontainer.json, if any)
+		<<<"$dc_json" > "$stage/.devcontainer/devcontainer.json"
 
 	# build (docker layer cache makes rebuilds of unchanged configs cheap)
 	dc_cli build --workspace-folder "$stage" --image-name "$image"
