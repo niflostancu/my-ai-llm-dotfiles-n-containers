@@ -5,12 +5,12 @@
     "npm:pi-thinking-box",
     "git:github.com/vedang/pi-prompt-history",
     "npm:pi-llama-cpp",
-    "npm:pi-mcp-adapter",
     "npm:@ff-labs/pi-fff",
     "npm:pi-cymbal",
     "npm:@mjakl/pi-subagent",
     "git:github.com/DietrichGebert/ponytail"
   ],
+  "defaultTools": ["+codemode"],
   "llamaSettings": {
     "servers": [
       {
@@ -27,5 +27,6 @@
   "llamaServerUrl": "http://host.docker.internal:11444",
   "quietStartup": true,
   "enableInstallTelemetry": false,
+  "tuiMode": "regular",
   "theme": "matrix"
 }

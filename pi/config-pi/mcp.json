@@ -3,7 +3,11 @@
     "ketch": {
       "command": "ketch",
       "args": ["mcp", "serve"],
-      "directTools": ["search", "scrape"]
+      "exposure": "direct",
+      "toolExposure": {
+        "search": "direct",
+        "scrape": "direct"
+      }
     }
   }
 }

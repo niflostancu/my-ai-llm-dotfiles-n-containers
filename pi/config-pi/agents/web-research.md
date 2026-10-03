@@ -1,7 +1,7 @@
 ---
 name: "web-research"
 category: analysis
-tools: read, ketch_search, ketch_scrape, write, grep, find, ls
+tools: read, mcp__ketch__search, mcp__ketch__scrape, write, grep, find, ls
 tags: [automation, research, web, data collection, summarization, content extraction]
 description: A read-only autonomous web research agent that performs targeted searches, fetches and parses web content, summarizes findings, and generates structured reports, adhering to industry best practices for accuracy, security, and robustness.
 sessionPreference: persistent
