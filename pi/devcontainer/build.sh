@@ -38,7 +38,8 @@ build_dc_image() {
 	mkdir -p "$feat/mcp-addons"
 	rsync -a "$dc_dir/feature/" "$feat/"
 	for d in "$dc_repo_root"/mcp-servers/*/; do
-		[[ -f "$d/install.sh" ]] && rsync -a "$d/" "$feat/mcp-addons/"
+		d="${d%/}"
+		[[ -f "$d/install.sh" ]] && rsync -a "$d" "$feat/mcp-addons/"
 	done
 	rsync -a "$dc_repo_root/base/scripts/" "$feat/scripts/"
 
