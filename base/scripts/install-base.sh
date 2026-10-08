@@ -52,10 +52,12 @@ localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
 [[ ! -f /usr/bin/fdfind ]] || ln -sf /usr/bin/fdfind /usr/local/bin/fd
 
 # Node.js from APT repository + Bun
-if ! command -v bun; then
+if ! command -v npm; then
 	curl -fsSL https://deb.nodesource.com/setup_lts.x | bash -
 	apt-get update
 	apt-get install -y nodejs
+fi
+if ! command -v bun; then
 	npm install -g bun
 fi
 
