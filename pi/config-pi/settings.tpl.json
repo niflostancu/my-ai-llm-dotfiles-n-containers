@@ -8,6 +8,7 @@
     "npm:@ff-labs/pi-fff",
     "npm:pi-cymbal",
     "npm:@mjakl/pi-subagent",
+    "npm:@getpipher/vision",
     "git:github.com/DietrichGebert/ponytail"
   ],
   "defaultTools": ["+codemode"],
