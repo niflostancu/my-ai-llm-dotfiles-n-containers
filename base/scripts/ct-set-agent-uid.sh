@@ -34,3 +34,10 @@ if [ -n "$AGENT_UID" ]; then
 fi
 
 export AGENT_USER
+
+# optional sudo rights for the agent user (usually set by docker)
+if [ "${SUDO:-0}" = "1" ]; then
+	printf '%s ALL=(ALL) NOPASSWD: ALL\n' "${AGENT_USER:-agent}" > /etc/sudoers.d/agent
+	chmod 0440 /etc/sudoers.d/agent
+	[ -z "$DEBUG" ] || echo "Enabled passwordless sudo for ${AGENT_USER:-agent}" >&2
+fi

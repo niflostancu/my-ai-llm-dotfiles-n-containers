@@ -43,6 +43,7 @@ DOCKER_ENV=${DOCKER_ENV:-"$PI_AGENT_HOME/.env"}
 [ -z ${DOCKER_ARGS+x} ] || DOCKER_ARGS=()
 
 CMD_ARGS=(pi)
+SUDO=0
 if [[ "$PI_CFG" == "little" ]]; then CMD_ARGS=(little-coder); fi
 if [[ "$PI_CFG" == "omp" ]]; then CMD_ARGS=(omp); fi
 # parse cmd args
@@ -51,6 +52,8 @@ while [ $# -gt 0 ]; do
 		NAME="$2"; shift;
 	elif [[ "$1" == "--cmd" ]]; then
 		CMD_ARGS=();
+	elif [[ "$1" == "--sudo" ]]; then
+		SUDO=1
 	elif [[ "$1" == "--root-shell" ]]; then
 		CMD_ARGS=(--root-shell)
 	else 
@@ -72,7 +75,7 @@ DOCKER_ARGS+=(
 	--network "$DOCKER_NET"
 	--add-host=host.docker.internal:host-gateway
 	--workdir "$WORKDIR"
-	-e "AGENT_UID=$(id -u)" -e "AGENT_GID=$(id -g)"
+	-e "AGENT_UID=$(id -u)" -e "AGENT_GID=$(id -g)" -e "SUDO=$SUDO"
 	# PI envs for completeness (i.e., devcontainer-built images)
 	-e "PI_CODING_AGENT_DIR=/home/agent/.config/pi-agent${_PI_SUFFIX}"
 )

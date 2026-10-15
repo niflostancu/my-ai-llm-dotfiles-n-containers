@@ -18,7 +18,7 @@ if ! id agent >/dev/null 2>&1; then
 fi
 
 MINIMAL_PACKAGES=(
-	bash gosu rsync ca-certificates curl wget git python3 python3-pip
+	bash gosu sudo rsync ca-certificates curl wget git python3 python3-pip
 	iputils-ping dnsutils host netcat-openbsd socat
 	# build tools required for cgo / treesitter-based tools
 	build-essential make
