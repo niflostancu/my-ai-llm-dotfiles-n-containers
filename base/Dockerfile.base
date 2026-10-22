@@ -3,7 +3,7 @@ FROM debian:13
 
 # Install shared base layer
 COPY --chmod=755 scripts/install-base.sh /tmp/install-base.sh
-RUN INSTALL_GO=1 /tmp/install-base.sh full \
+RUN /tmp/install-base.sh full \
     && rm /tmp/install-base.sh
 
 ENV LANG=en_US.UTF-8 \

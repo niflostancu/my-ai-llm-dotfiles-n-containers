@@ -11,7 +11,6 @@ echo "[pi-agent feature] installing (variant: ${VARIANT:-pi})"
 # install base layer (when not using the compatible Docker image)
 if [[ -z "${AGENT_BASE_INSTALLED:-}" ]]; then
 	# go is needed by the ketch mcp server
-	export INSTALL_GO=1
 	bash scripts/install-base.sh minimal
 	cp scripts/ct-set-agent-uid.sh scripts/entrypoint-base.sh /usr/local/bin/
 	ln -sf /usr/local/bin/entrypoint-base.sh /usr/local/bin/agent-entrypoint.sh
