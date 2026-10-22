@@ -46,23 +46,42 @@ CMD_ARGS=(pi)
 SUDO=0
 if [[ "$PI_CFG" == "little" ]]; then CMD_ARGS=(little-coder); fi
 if [[ "$PI_CFG" == "omp" ]]; then CMD_ARGS=(omp); fi
+usage() {
+	cat <<EOF
+Usage: pi-agent.sh [options] [args...]
+
+Run the pi agent in a Docker container.
+
+Options:
+  --name <name>     Container/project name (default: derived from working directory)
+  --cmd             Remaining arguments are the full command (default: pi)
+  --volume <v>, -v  Extra Docker volume, same syntax as docker CLI (source:target[:mode])
+  --sudo            Allow sudo inside the container
+  --root-shell      Use the root shell
+  -h, --help        Show this help
+
+All non-flag arguments (or everything after "--") are passed to the command.
+
+Environment:
+  PI_CFG              Config variant (default: pi)
+  DOCKER_PI_IMAGE     Docker image to run (default: personal/ai-ag-pi[-<PI_CFG>])
+  DOCKER_ENV          Path to a docker --env-file (default: ~/.config/pi-agent[-<PI_CFG>]/.env)
+  DOCKER_ARGS         Prepend extra raw docker run arguments (bash array)
+  PI_DEVCONTAINER     Build image from .devcontainer if present (default: 1)
+EOF
+}
+
 # parse cmd args
 while [ $# -gt 0 ]; do
-	if [[ "$1" == "--name" ]]; then
-		NAME="$2"; shift;
-	elif [[ "$1" == "--cmd" ]]; then
-		CMD_ARGS=();
-	elif [[ "$1" == "--volume" || "$1" == "-v" ]]; then
-		DOCKER_ARGS+=(-v "$2"); shift;
-	elif [[ "$1" == "--sudo" ]]; then
-		SUDO=1
-	elif [[ "$1" == "--root-shell" ]]; then
-		CMD_ARGS=(--root-shell)
-	else 
-		if [[ "$1" == "--" ]]; then shift; fi
-		CMD_ARGS+=("$@"); break
-	fi
-	shift
+	case "$1" in
+		-h|--help) usage; exit 0;;
+		--name) NAME="$2"; shift 2;;
+		--cmd) CMD_ARGS=(); shift;;
+		-v|--volume) DOCKER_ARGS+=(-v "$2"); shift 2;;
+		--sudo) SUDO=1; shift;;
+		--root-shell) CMD_ARGS=(--root-shell); shift;;
+		--|*) [[ "$1" == "--" ]] && shift; CMD_ARGS+=("$@"); break;;
+	esac
 done
 
 # finally, build the docker environment
