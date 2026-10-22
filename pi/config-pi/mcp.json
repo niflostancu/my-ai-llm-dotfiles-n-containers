@@ -1,13 +1,10 @@
 {
   "mcpServers": {
-    "ketch": {
-      "command": "ketch",
-      "args": ["mcp", "serve"],
-      "exposure": "direct",
-      "toolExposure": {
-        "search": "direct",
-        "scrape": "direct"
-      }
+    "searxng": {
+      "url": "http://ai-searxng-mcp:8080/mcp"
+    },
+    "scrapling": {
+      "url": "http://ai-scrapling-mcp:8000/mcp"
     }
   }
 }

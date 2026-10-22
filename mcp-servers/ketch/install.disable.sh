@@ -3,6 +3,5 @@
 set -eo pipefail
 
 gosu "${AGENT_USER:-agent}" go install github.com/1broseidon/ketch@latest
-
 rsync -avh --mkpath ./config/ /home/agent/.config/ketch/
 
