@@ -52,6 +52,8 @@ while [ $# -gt 0 ]; do
 		NAME="$2"; shift;
 	elif [[ "$1" == "--cmd" ]]; then
 		CMD_ARGS=();
+	elif [[ "$1" == "--volume" || "$1" == "-v" ]]; then
+		DOCKER_ARGS+=(-v "$2"); shift;
 	elif [[ "$1" == "--sudo" ]]; then
 		SUDO=1
 	elif [[ "$1" == "--root-shell" ]]; then
