@@ -3,7 +3,7 @@
     "npm:pi-zentui",
     "npm:@firstpick/pi-themes-bundle",
     "npm:pi-thinking-box",
-    "git:github.com/vedang/pi-prompt-history",
+    "npm:pi-input-history",
     "npm:pi-llama-cpp",
     "npm:@ff-labs/pi-fff",
     "npm:pi-cymbal",
