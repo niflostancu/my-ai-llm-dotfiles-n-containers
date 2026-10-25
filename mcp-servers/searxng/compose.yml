@@ -20,6 +20,7 @@ services:
   mcp-search:
     container_name: ai-searxng-mcp
     image: isokoliuk/mcp-searxng:latest
+    restart: always
     stdin_open: true
     env_file: .env
     environment:
@@ -36,6 +37,7 @@ services:
   scrapling:
     container_name: ai-scrapling-mcp
     image: pyd4vinci/scrapling
+    restart: always
     command: mcp --http --host '0.0.0.0' --no-auth
     env_file: .env
     environment:
