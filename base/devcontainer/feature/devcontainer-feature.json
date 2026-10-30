@@ -1,0 +1,23 @@
+{
+	"name": "agent",
+	"id": "personal-agent",
+	"version": "1.0.0",
+	"description": "Coding agent harness (CLI + personal MCP tools) from <harness>/devcontainer/harness.sh. Debian-based images only.",
+	"options": {
+		"variant": {
+			"type": "string",
+			"default": "pi",
+			"description": "Harness/variant to install, interpreted by the harness' install_harness(): e.g. pi/omp/little, claude, opencode"
+		},
+		"AGENT_BASE_INSTALLED": {
+			"type": "string",
+			"default": "",
+			"description": "Set to 1 when building on top of a compatible ai-base image (skips base deps install)"
+		}
+	},
+	"entrypoint": "/usr/local/bin/agent-entrypoint.sh",
+	"containerEnv": {
+		"HOME": "/home/agent",
+		"PATH": "/home/agent/go/bin:/home/agent/.bun/bin:/usr/local/go/bin:${PATH}"
+	}
+}

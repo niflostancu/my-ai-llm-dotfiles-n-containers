@@ -8,7 +8,8 @@ XDG_DATA_HOME ?= $(HOME)/.local/share
 IMAGE_PREFIX = personal/
 docker_pi_args = \
 	--build-arg "BASE_IMAGE=$(IMAGE_PREFIX)ai-ag-base" \
-	--build-context mcp-addons=../mcp-servers/
+	--build-context mcp-addons=../mcp-servers/ \
+	--build-context agent-base=../base/
 
 docker_pi-image-name = ai-ag-pi
 docker_pi-dockerfile = Dockerfile

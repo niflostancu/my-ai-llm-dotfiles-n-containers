@@ -8,6 +8,8 @@ set -eo pipefail
 SCRIPT_DIR=$(cd -- "$(dirname -- "$(realpath -e "${BASH_SOURCE[0]}")")" &>/dev/null && pwd)
 # shellcheck source=../base/agent-run.sh
 source "$SCRIPT_DIR/../base/agent-run.sh"
+# shellcheck source=../base/devcontainer/run.sh
+source "$SCRIPT_DIR/../base/devcontainer/run.sh"
 
 GOOSE_AGENT_DIR=${GOOSE_AGENT_DIR:-"goose"}
 
@@ -25,5 +27,11 @@ agent_usage=(
 	"  GOOSE_AGENT_DIR    Config dir under ~/.config (default: goose)"
 	"  DOCKER_GOOSE_IMAGE Docker image to run (default: $agent_image)"
 )
+
+# devcontainer project support: run goose inside the project's .devcontainer
+# image, built with the shared agent feature (see base/devcontainer/run.sh)
+agent_setup() {
+	dc_agent_setup goose "$agent_image"
+}
 
 agent_run "$@"

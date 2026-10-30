@@ -49,6 +49,7 @@ Environment:
   AGENT_NET          Docker network (default: $AGENT_NET)
   AGENT_MEMORY       Docker memory limit (default: $AGENT_MEMORY)
   AGENT_CPUS         Docker CPU limit (default: $AGENT_CPUS)
+  AGENT_DEVCONTAINER Build image from .devcontainer if present (default: 1)
 EOF
 	if ((${#agent_usage[@]})); then printf '%s\n' "${agent_usage[@]}"; fi
 }
