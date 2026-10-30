@@ -1,0 +1,5 @@
+# Shared shellcheck rules for this repo (found by walking up from each script).
+
+# Scripts `source` helpers resolved at runtime from $SCRIPT_DIR, or files that
+# only exist inside the container (e.g. /usr/local/bin/*). Not followable.
+disable=SC1090,SC1091
