@@ -11,7 +11,6 @@ source "$SCRIPT_DIR/../base/docker-helpers.sh"
 WORKDIR=$PWD
 NAME=$(get_project_name "$WORKDIR")
 DOCKER_GOOSE_IMAGE=${DOCKER_GOOSE_IMAGE:-"personal/ai-ag-goose"}
-DOCKER_USERNAME=agent
 DOCKER_NET=ai-agents-net
 
 # use separate home config paths for the different cfg variants

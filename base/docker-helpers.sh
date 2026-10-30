@@ -1,6 +1,9 @@
 #!/bin/bash
 # Docker agent run helpers
 
+# container-side user name (mapped to the host UID/GID by docker_add_volume)
+DOCKER_USERNAME=${DOCKER_USERNAME:-agent}
+
 declare -ag PROJECT_ROOT_NAMES=(
     ".git" ".svn" ".hg" ".bzr" "Makefile"
     "Cargo.toml" "package.json" "go.mod"
@@ -51,7 +54,8 @@ function docker_add_volume() {
     mkdir -p "$hostpath"
     # apply docker auto-created volume owner fix if hostpath inside home
     if is_inside_home "$hostpath"; then
-        local exp_uids="$(id -u):$(id -g)"
+        local exp_uids
+        exp_uids="$(id -u):$(id -g)"
         if [[ "$(stat -c '%u:%g' "$hostpath")" != "$exp_uids" ]]; then
             sudo chown "$exp_uids" "$hostpath"
         fi

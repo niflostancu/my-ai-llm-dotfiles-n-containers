@@ -1,6 +1,6 @@
 #!/bin/bash
 # Repo linters. Run via `make lint` or directly: scripts/lint.sh [sh|config]
-#   sh     - shellcheck every tracked *.sh (rules: ./.shellcheckrc)
+#   sh     - shellcheck -x every tracked *.sh (rules: ./.shellcheckrc)
 #   config - YAML/JSON syntax of every tracked config (compose, agent configs)
 #   all    - both (default)
 set -euo pipefail
@@ -28,7 +28,7 @@ lint_sh() {
 	mapfile -d '' -t files < <(tracked '*.sh')
 	((${#files[@]})) || { echo "lint-sh: no shell scripts found" >&2; return 1; }
 	echo "shellcheck: ${#files[@]} file(s)"
-	shellcheck "${files[@]}"
+	shellcheck -x "${files[@]}"
 }
 
 lint_config() {

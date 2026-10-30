@@ -17,7 +17,6 @@ _PI_SUFFIX=; [[ "$PI_CFG" == "pi" ]] || _PI_SUFFIX="-${PI_CFG}"
 WORKDIR=$PWD
 NAME=$(get_project_name "$WORKDIR")
 DOCKER_PI_IMAGE=${DOCKER_PI_IMAGE:-"personal/ai-ag-pi${_PI_SUFFIX}"}
-DOCKER_USERNAME=agent
 DOCKER_NET=ai-agents-net
 
 # devcontainer project support: if the project ships a .devcontainer config,
