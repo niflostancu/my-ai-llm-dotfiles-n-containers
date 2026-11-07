@@ -2,7 +2,7 @@
 
 IMAGE_PREFIX = personal/
 
-GPU_PLATFORM ?= rocm
+GPU_PLATFORM ?= vulkan
 GPU_ROCM_GFX ?= gfx1100
 GPU_CUDA_VERSION ?= 13.3.1
 GPU_CUDA_ARCHITECTURES ?= 120
@@ -14,14 +14,20 @@ LLAMACPP_GIT_BRANCH = "master"
 
 LLAMACPP_ROCM_IMAGE = llama.cpp-rocm-$(GPU_ROCM_GFX)
 LLAMACPP_CUDA_IMAGE ?= llama.cpp-cuda
+LLAMACPP_VULKAN_IMAGE = llama.cpp-vulkan
 CUDA_VERSION ?= 13.3.1
 
 docker_llamacpp_common-flags = \
 	--build-arg "LLAMACPP_GIT_URL=$(LLAMACPP_GIT_URL)" \
 	--build-arg "LLAMACPP_GIT_BRANCH=$(LLAMACPP_GIT_BRANCH)"
 
+docker_llamacpp_vulkan-image-name = $(LLAMACPP_VULKAN_IMAGE)
+docker_llamacpp_vulkan-dockerfile = Dockerfile.vulkan
+docker_llamacpp_vulkan-buildx-args = \
+	$(docker_llamacpp_common-flags)
+
 docker_llamacpp_rocm-image-name = $(LLAMACPP_ROCM_IMAGE)
-docker_llamacpp_rocm-dockerfile = Dockerfile
+docker_llamacpp_rocm-dockerfile = Dockerfile.rocm
 docker_llamacpp_rocm-buildx-args = \
 	$(docker_llamacpp_common-flags)
 
@@ -39,6 +45,7 @@ include ../base/_docker_lib.mk
 all: build
 build: docker_llamacpp_$(GPU_PLATFORM)_build
 
+$(call add_docker_target,docker_llamacpp_vulkan)
 $(call add_docker_target,docker_llamacpp_rocm)
 $(call add_docker_target,docker_llamacpp_cuda)
 

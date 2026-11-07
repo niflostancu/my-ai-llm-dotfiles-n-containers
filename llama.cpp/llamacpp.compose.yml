@@ -1,4 +1,4 @@
 
 include:
-  - llamacpp-${GPU_PLATFORM:-rocm}.compose.yml
+  - llamacpp-${GPU_PLATFORM:-vulkan}.compose.yml
 

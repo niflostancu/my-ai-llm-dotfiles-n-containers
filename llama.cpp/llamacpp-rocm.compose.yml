@@ -17,9 +17,9 @@ services:
       - /dev/kfd
       - /dev/dri
       - /dev/mem
-    cap_add:
-      - CAP_SYS_ADMIN
-      - SYS_PTRACE
+    # cap_add:
+    #   - CAP_SYS_ADMIN
+    #   - SYS_PTRACE
     # group_add:
     #   - render
     ports:
